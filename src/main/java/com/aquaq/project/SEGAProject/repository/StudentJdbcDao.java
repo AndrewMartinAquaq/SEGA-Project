@@ -2,6 +2,7 @@ package com.aquaq.project.SEGAProject.repository;
 
 import com.aquaq.project.SEGAProject.entity.Student;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -44,6 +45,36 @@ public class StudentJdbcDao {
         jdbcTemplate.update(c -> c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS), keyHolder);
 
         return keyHolder.getKey().intValue();
+    }
+
+    public int update(Student student){
+        String sql = "update student set first_name = ?, last_name = ?, grad_year = ? "
+                + "where id = ?";
+
+        Object[] values = new Object[]{
+                student.getFirstName(),
+                student.getLastName(),
+                student.getGraduationDate(),
+                student.getId()};
+
+        int updated = jdbcTemplate.update(sql, values);
+
+        if(updated == 0){
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        return student.getId();
+    }
+    public int deleteByID(int id) {
+
+        int deleted = jdbcTemplate.update("delete from Student where id=?", new Object[]{id});
+
+
+        if (deleted == 0) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        return deleted;
     }
 
 }

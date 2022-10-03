@@ -48,8 +48,6 @@ public class StudentJdbcDaoTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    //when(templateMock.update(any(PreparedStatementCreator.class), any())).thenReturn(1);
-
     @Test
     public void getAllStudentsTest(){
         int actualId = 1;
