@@ -1,12 +1,16 @@
 package com.aquaq.project.SEGAProject.entity;
 
 import javax.persistence.Entity;
+import javax.validation.constraints.NotBlank;
 
 public class Student {
 
     private int id;
+    @NotBlank
     private String firstName;
+    @NotBlank
     private String lastName;
+    @NotBlank
     private String graduationDate;
 
     public int getId() {
