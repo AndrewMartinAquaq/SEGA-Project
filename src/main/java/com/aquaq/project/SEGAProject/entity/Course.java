@@ -8,17 +8,10 @@ import javax.validation.constraints.NotNull;
 public class Course {
 
     private int id;
-    @NotBlank
     private String courseName;
-    @NotNull
-    @Min(value=0)
     private int capacity;
-    @NotNull
-    @Min(value=0)
     private int credit;
-    @NotBlank
     private String subject;
-    @NotBlank
     private String semester;
 
     public Course(int id, String courseName, int capacity, int credit, String subject, String semester) {

@@ -1,8 +1,10 @@
 package com.aquaq.project.SEGAProject.rest;
 
+import com.aquaq.project.SEGAProject.dto.StudentDTO;
 import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -20,9 +22,12 @@ public class StudentRestController {
     @Autowired
     StudentJdbcDao repository;
 
+    @Autowired
+    ModelMapper modelMapper;
+
     @PostMapping("/student")
-    @ResponseBody
-    public ResponseEntity<String> postStudent(@Valid Student student){
+    public ResponseEntity<String> postStudent(@ModelAttribute @Valid StudentDTO studentDTO){
+            Student student = this.modelMapper.map(studentDTO, Student.class);
             int id = repository.insert(student);
             String body = "{ \"studentsAdded\" : 1, \"Link\" : \"http://localhost:8080/api/student/" + id + "\" }";
             ResponseEntity<String> response = new ResponseEntity<String>(body, HttpStatus.CREATED);
@@ -32,7 +37,8 @@ public class StudentRestController {
 
     @PutMapping("/student/{id}")
     @ResponseBody
-    public ResponseEntity<String> putStudent(@Valid Student student, @PathVariable @NotBlank int id){
+    public ResponseEntity<String> putStudent(@ModelAttribute @Valid StudentDTO studentDTO, @PathVariable @NotBlank int id){
+        Student student = this.modelMapper.map(studentDTO, Student.class);
         student.setId(id);
 
         try {

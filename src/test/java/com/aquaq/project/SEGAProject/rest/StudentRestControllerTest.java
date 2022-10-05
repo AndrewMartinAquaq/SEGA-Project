@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,6 +32,9 @@ public class StudentRestControllerTest {
 
     @MockBean
     private StudentJdbcDao studentRepository;
+
+    @MockBean
+    private ModelMapper modelMapper;
 
     @Test
     public void getStudentByIdTest() throws Exception {
@@ -66,7 +70,7 @@ public class StudentRestControllerTest {
         assertTrue(response.getContentAsString().contains(actualGradDate));
     }
 
-    /*
+
     @Test
     @DirtiesContext
     public void postStudentTest() throws Exception {
@@ -82,14 +86,14 @@ public class StudentRestControllerTest {
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
         String requestJson=ow.writeValueAsString(student);
 
-        when(studentRepository.insert(new Student(expectedId, actualFirstName, actualLastName, actualGradDate))).thenReturn(1);
+        when(studentRepository.insert(student)).thenReturn(1);
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/api/student")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestJson))
                 .andExpect(status().isCreated()).andReturn().getResponse();
         assertTrue(response.getContentAsString().contains(Integer.toString(1)));
     }
-     */
+
 
 
     @Test

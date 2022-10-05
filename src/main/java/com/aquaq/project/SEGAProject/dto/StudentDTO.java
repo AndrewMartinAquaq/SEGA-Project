@@ -1,22 +1,22 @@
-package com.aquaq.project.SEGAProject.entity;
+package com.aquaq.project.SEGAProject.dto;
 
-import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 
-public class Student {
-
-    private int id;
+public class StudentDTO {
+    @NotBlank
     private String firstName;
+    @NotBlank
     private String lastName;
-
+    @NotBlank
     private String graduationDate;
 
-    public int getId() {
-        return id;
+    public StudentDTO() {
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public StudentDTO(String firstName, String lastName, String graduationDate) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.graduationDate = graduationDate;
     }
 
     public String getFirstName() {
@@ -40,17 +40,6 @@ public class Student {
     }
 
     public void setGraduationDate(String graduationDate) {
-        this.graduationDate = graduationDate;
-    }
-
-    public Student(){
-
-    }
-
-    public Student(int id, String firstName, String lastName, String graduationDate) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
         this.graduationDate = graduationDate;
     }
 }
