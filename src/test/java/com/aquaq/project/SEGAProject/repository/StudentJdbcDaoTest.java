@@ -6,9 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -134,6 +132,49 @@ public class StudentJdbcDaoTest {
         assertEquals(actualFirstName, student.getFirstName());
         assertEquals(actualLastName, student.getLastName());
         assertEquals(actualGradDate, student.getGraduationDate());
+    }
+
+    @Test
+    @DirtiesContext
+    public void updateTest(){
+        int expectedId = 1;
+        String actualFirstName = "John";
+        String actualLastName = "Doe";
+        String actualGradDate = "DECEMBER2022";
+        Student student = new Student(expectedId, actualFirstName, actualLastName, actualGradDate);
+
+        String sql = "update student set first_name = ?, last_name = ?, grad_year = ? "
+                + "where id = ?";
+
+        Object[] values = new Object[]{
+                student.getFirstName(),
+                student.getLastName(),
+                student.getGraduationDate(),
+                student.getId()};
+
+        when(templateMock.update(sql, values)).thenReturn(1);
+
+        int actualId = repository.update(student);
+
+        verify(templateMock, times(1)).update(sql, values);
+
+        assertEquals(expectedId, actualId);
+    }
+
+    @Test
+    @DirtiesContext
+    public void deleteStudentTest(){
+        String sql = "delete from Student where id=?";
+
+        Object[] values = new Object[]{1};
+
+        when(templateMock.update(sql, values)).thenReturn(1);
+
+        int actualNoDeleted = repository.deleteByID(1);
+
+        verify(templateMock, times(1)).update(sql, values);
+
+        assertEquals(1, actualNoDeleted);
     }
 
 }

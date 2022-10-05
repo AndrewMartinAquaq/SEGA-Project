@@ -3,10 +3,10 @@ package com.aquaq.project.SEGAProject.rest;
 import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
-import netscape.javascript.JSObject;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,15 +22,17 @@ public class StudentRestController {
 
     @PostMapping("/student")
     @ResponseBody
-    public String postStudent(@Valid Student student){
+    public ResponseEntity<String> postStudent(@Valid Student student){
             int id = repository.insert(student);
+            String body = "{ \"studentsAdded\" : 1, \"Link\" : \"http://localhost:8080/api/student/" + id + "\" }";
+            ResponseEntity<String> response = new ResponseEntity<String>(body, HttpStatus.CREATED);
 
-            return "{ \"studentsAdded\" : 1, \"Link\" : \"http://localhost:8080/api/student/" + id + "\" }";
+            return response;
     }
 
     @PutMapping("/student/{id}")
     @ResponseBody
-    public String putStudent(@Valid Student student, @PathVariable @NotBlank int id){
+    public ResponseEntity<String> putStudent(@Valid Student student, @PathVariable @NotBlank int id){
         student.setId(id);
 
         try {
@@ -38,8 +40,15 @@ public class StudentRestController {
         } catch (EmptyResultDataAccessException e) {
             throw new RecordNotFoundException("Student record not found at id - " + id);
         }
+        String body = "{ \"studentsUpdated\" : 1, \"Link\" : \"http://localhost:8080/api/student/" + id + "\" }";
+        ResponseEntity<String> response = new ResponseEntity<String>(body, HttpStatus.OK);
 
-        return "{ \"studentsUpdated\" : 1, \"Link\" : \"http://localhost:8080/api/student/" + id + "\" }";
+        return response;
+    }
+
+    @GetMapping("/student")
+    public List<Student> getAllStudents(){
+        return repository.getAllStudents();
     }
 
     @GetMapping("/student/name")
@@ -65,13 +74,15 @@ public class StudentRestController {
     }
 
     @DeleteMapping("/student/{id}")
-    public String deleteStudentById(@PathVariable @NotBlank int id){
+    public ResponseEntity<String> deleteStudentById(@PathVariable @NotBlank int id){
         try {
             repository.deleteByID(id);
         } catch (EmptyResultDataAccessException e) {
             throw new RecordNotFoundException("Student record not found at id - " + id);
         }
-        return "{ \"studentsDeleted\" : 1 }";
+        ResponseEntity<String> response = new ResponseEntity<String>("{ \"studentsDeleted\" : 1 }", HttpStatus.OK);
+
+        return response;
     }
 
 }

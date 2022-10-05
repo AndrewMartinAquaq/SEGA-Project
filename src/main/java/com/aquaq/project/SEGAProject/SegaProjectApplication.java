@@ -11,17 +11,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SegaProjectApplication implements CommandLineRunner {
 
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	@Autowired
-	StudentJdbcDao repository;
-
 	public static void main(String[] args) {
 		SpringApplication.run(SegaProjectApplication.class, args);
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-		logger.info("All users -> {}", repository.getAllStudents());
 	}
 }

@@ -1,21 +1,25 @@
 package com.aquaq.project.SEGAProject.entity;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 
 public class Course {
 
-    int id;
+    private int id;
     @NotBlank
-    String courseName;
+    private String courseName;
+    @NotNull
+    @Min(value=0)
+    private int capacity;
+    @NotNull
+    @Min(value=0)
+    private int credit;
     @NotBlank
-    int capacity;
+    private String subject;
     @NotBlank
-    int credit;
-    @NotBlank
-    String subject;
-    @NotBlank
-    String semester;
+    private String semester;
 
     public Course(int id, String courseName, int capacity, int credit, String subject, String semester) {
         this.id = id;
