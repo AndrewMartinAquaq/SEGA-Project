@@ -1,33 +1,45 @@
 package com.aquaq.project.SEGAProject.rest;
 
+import com.aquaq.project.SEGAProject.dto.CourseDTO;
+import com.aquaq.project.SEGAProject.dto.StudentDTO;
 import com.aquaq.project.SEGAProject.entity.Course;
+import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.CourseJdbcDao;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CourseRestController.class)
 public class CourseRestControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    CourseRestController courseRestController;
 
-    @MockBean
-    private CourseJdbcDao courseRepository;
+    @Mock
+    CourseJdbcDao courseJdbcDao;
+
+    @Mock
+    ModelMapper modelMapper;
+
+    @BeforeEach
+    public void setup(){
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
-    public void getAllCoursesTest() throws Exception {
+    public void getAllCoursesTest(){
         int actualId = 1;
         String actualCourseName = "COM101";
         int actualCapacity = 100;
@@ -35,23 +47,19 @@ public class CourseRestControllerTest {
         String actualSubject = "Java Programming";
         String actualSemester = "DECEMBER2022";
 
-        List<Course> courseList = new ArrayList<>();
+        List<Course> expectedList = new ArrayList<>();
 
-        courseList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
+        expectedList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
+        when(courseJdbcDao.getAllCourses()).thenReturn(expectedList);
+        List<Course> actualList = courseRestController.getAllCourse();
 
-        when(courseRepository.getAllCourses()).thenReturn(courseList);
-        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/course"))
-                .andExpect(status().isOk()).andReturn().getResponse();
-        assertTrue(response.getContentAsString().contains(Integer.toString(actualId)));
-        assertTrue(response.getContentAsString().contains(actualCourseName));
-        assertTrue(response.getContentAsString().contains(Integer.toString(actualCapacity)));
-        assertTrue(response.getContentAsString().contains(Integer.toString(actualCredit)));
-        assertTrue(response.getContentAsString().contains(actualSubject));
-        assertTrue(response.getContentAsString().contains(actualSemester));
+        verify(courseJdbcDao).getAllCourses();
+
+        assertEquals(expectedList.get(0), actualList.get(0));
     }
 
     @Test
-    public void getCoursesByNameTest() throws Exception {
+    public void getCourseByNameTest(){
         int actualId = 1;
         String actualCourseName = "COM101";
         int actualCapacity = 100;
@@ -59,23 +67,19 @@ public class CourseRestControllerTest {
         String actualSubject = "Java Programming";
         String actualSemester = "DECEMBER2022";
 
-        List<Course> courseList = new ArrayList<>();
+        List<Course> expectedList = new ArrayList<>();
 
-        courseList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
+        expectedList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
+        when(courseJdbcDao.getByCourse(actualCourseName)).thenReturn(expectedList);
+        List<Course> actualList = courseRestController.getCourseByName(actualCourseName);
 
-        when(courseRepository.getByCourse("COM101")).thenReturn(courseList);
-        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/course/name?name=COM101"))
-                .andExpect(status().isOk()).andReturn().getResponse();
-        assertTrue(response.getContentAsString().contains(Integer.toString(actualId)));
-        assertTrue(response.getContentAsString().contains(actualCourseName));
-        assertTrue(response.getContentAsString().contains(Integer.toString(actualCapacity)));
-        assertTrue(response.getContentAsString().contains(Integer.toString(actualCredit)));
-        assertTrue(response.getContentAsString().contains(actualSubject));
-        assertTrue(response.getContentAsString().contains(actualSemester));
+        verify(courseJdbcDao).getByCourse(actualCourseName);
+
+        assertEquals(expectedList.get(0), actualList.get(0));
     }
 
     @Test
-    public void getCoursesByIdTest() throws Exception {
+    public void getStudentByIdTest(){
         int actualId = 1;
         String actualCourseName = "COM101";
         int actualCapacity = 100;
@@ -83,30 +87,73 @@ public class CourseRestControllerTest {
         String actualSubject = "Java Programming";
         String actualSemester = "DECEMBER2022";
 
+        Course expectedCourse = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
 
-        Course course = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
+        when(courseJdbcDao.getById(anyInt())).thenReturn(expectedCourse);
 
-        when(courseRepository.getById(actualId)).thenReturn(course);
-        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/course/1"))
-                .andExpect(status().isOk()).andReturn().getResponse();
-        assertTrue(response.getContentAsString().contains(Integer.toString(actualId)));
-        assertTrue(response.getContentAsString().contains(actualCourseName));
-        assertTrue(response.getContentAsString().contains(Integer.toString(actualCapacity)));
-        assertTrue(response.getContentAsString().contains(Integer.toString(actualCredit)));
-        assertTrue(response.getContentAsString().contains(actualSubject));
-        assertTrue(response.getContentAsString().contains(actualSemester));
+        Course actualCourse = courseRestController.getCourseById(1);
 
+        verify(courseJdbcDao).getById(anyInt());
+
+        assertEquals(expectedCourse, actualCourse);
     }
 
     @Test
-    @DirtiesContext
-    public void deleteCourseByIdTest() throws Exception {
+    public void deleteStudentByIdTest(){
 
+        when(courseJdbcDao.deleteByID(anyInt())).thenReturn(1);
 
-        when(courseRepository.deleteByID(1)).thenReturn(1);
+        ResponseEntity<String> response = courseRestController.deleteCourseById(1);
 
-        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.delete("/api/course/1"))
-                .andExpect(status().isOk()).andReturn().getResponse();
-        assertTrue(response.getContentAsString().contains(Integer.toString(1)));
+        verify(courseJdbcDao).deleteByID(anyInt());
+
+        assertTrue(response.toString().contains("1"));
     }
+
+    @Test
+    public void postStudentTest(){
+        int actualId = 1;
+        String actualCourseName = "COM101";
+        int actualCapacity = 100;
+        int actualCredit = 10;
+        String actualSubject = "Java Programming";
+        String actualSemester = "DECEMBER2022";
+
+        Course expectedCourse = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
+        CourseDTO courseDTO = new CourseDTO(actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
+
+        when(courseJdbcDao.insert(expectedCourse)).thenReturn(1);
+        when(modelMapper.map(courseDTO, Course.class)).thenReturn(expectedCourse);
+
+        ResponseEntity<String> response = courseRestController.postCourse(courseDTO);
+
+        verify(courseJdbcDao).insert(expectedCourse);
+        verify(modelMapper).map(courseDTO, Course.class);
+
+        assertTrue(response.toString().contains("1"));
+    }
+
+    @Test
+    public void putStudentTest(){
+        int actualId = 1;
+        String actualCourseName = "COM101";
+        int actualCapacity = 100;
+        int actualCredit = 10;
+        String actualSubject = "Java Programming";
+        String actualSemester = "DECEMBER2022";
+
+        Course expectedCourse = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
+        CourseDTO courseDTO = new CourseDTO(actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
+
+        when(courseJdbcDao.update(expectedCourse)).thenReturn(1);
+        when(modelMapper.map(courseDTO, Course.class)).thenReturn(expectedCourse);
+
+        ResponseEntity<String> response = courseRestController.putCourse(courseDTO, actualId);
+
+        verify(courseJdbcDao).update(expectedCourse);
+        verify(modelMapper).map(courseDTO, Course.class);
+
+        assertTrue(response.toString().contains("1"));
+    }
+
 }

@@ -1,8 +1,10 @@
 package com.aquaq.project.SEGAProject.rest;
 
+import com.aquaq.project.SEGAProject.dto.CourseDTO;
 import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.repository.CourseJdbcDao;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -22,9 +24,12 @@ public class CourseRestController {
     @Autowired
     CourseJdbcDao repository;
 
+    @Autowired
+    ModelMapper modelMapper;
+
     @PostMapping("/course")
-    @ResponseBody
-    public ResponseEntity<String> postCourse(@Valid Course course){
+    public ResponseEntity<String> postCourse(@RequestBody @Valid CourseDTO courseDTO){
+        Course course = this.modelMapper.map(courseDTO, Course.class);
             int id = repository.insert(course);
             String body =  "{ \"Courses\" : 1, \"Link\" : \"http://localhost:8080/api/course/" + id + "\" }";
 
@@ -34,8 +39,9 @@ public class CourseRestController {
     }
 
     @PutMapping("/course/{id}")
-    @ResponseBody
-    public ResponseEntity<String> putCourse(@Valid Course course, @PathVariable @NotBlank int id){
+    public ResponseEntity<String> putCourse(@RequestBody @Valid CourseDTO courseDTO, @PathVariable @NotBlank int id){
+        Course course = this.modelMapper.map(courseDTO, Course.class);
+
         course.setId(id);
 
         try {

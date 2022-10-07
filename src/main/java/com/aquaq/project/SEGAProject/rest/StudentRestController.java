@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,18 +27,17 @@ public class StudentRestController {
     ModelMapper modelMapper;
 
     @PostMapping("/student")
-    public ResponseEntity<String> postStudent(@ModelAttribute @Valid StudentDTO studentDTO){
+    public ResponseEntity<String> postStudent(@RequestBody @Valid StudentDTO studentDTO){
             Student student = this.modelMapper.map(studentDTO, Student.class);
             int id = repository.insert(student);
-            String body = "{ \"studentsAdded\" : 1, \"Link\" : \"http://localhost:8080/api/student/" + id + "\" }";
+            String body = "{ \"studentsAdded\" : 1, \"Link\"  : \"http://localhost:8080/api/student/" + id + "\" }";
             ResponseEntity<String> response = new ResponseEntity<String>(body, HttpStatus.CREATED);
 
             return response;
     }
 
     @PutMapping("/student/{id}")
-    @ResponseBody
-    public ResponseEntity<String> putStudent(@ModelAttribute @Valid StudentDTO studentDTO, @PathVariable @NotBlank int id){
+    public ResponseEntity<String> putStudent(@RequestBody @Valid StudentDTO studentDTO, @PathVariable @NotBlank int id){
         Student student = this.modelMapper.map(studentDTO, Student.class);
         student.setId(id);
 
