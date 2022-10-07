@@ -61,6 +61,30 @@ public class CourseRestControllerEndpointTest {
     }
 
     @Test
+    public void getAllCoursesBySubjectTest() throws Exception {
+        int actualId = 1;
+        String actualCourseName = "COM101";
+        int actualCapacity = 100;
+        int actualCredit = 10;
+        String actualSubject = "Python";
+        String actualSemester = "DECEMBER2022";
+
+        List<Course> courseList = new ArrayList<>();
+
+        courseList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
+
+        when(courseRepository.getCourseBySubject(actualSubject)).thenReturn(courseList);
+        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/course?subject=Python"))
+                .andExpect(status().isOk()).andReturn().getResponse();
+        assertTrue(response.getContentAsString().contains(Integer.toString(actualId)));
+        assertTrue(response.getContentAsString().contains(actualCourseName));
+        assertTrue(response.getContentAsString().contains(Integer.toString(actualCapacity)));
+        assertTrue(response.getContentAsString().contains(Integer.toString(actualCredit)));
+        assertTrue(response.getContentAsString().contains(actualSubject));
+        assertTrue(response.getContentAsString().contains(actualSemester));
+    }
+
+    @Test
     public void getCoursesByNameTest() throws Exception {
         int actualId = 1;
         String actualCourseName = "COM101";
@@ -73,7 +97,7 @@ public class CourseRestControllerEndpointTest {
 
         courseList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
 
-        when(courseRepository.getByCourse("COM101")).thenReturn(courseList);
+        when(courseRepository.getCourseByName("COM101")).thenReturn(courseList);
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/course/name?name=COM101"))
                 .andExpect(status().isOk()).andReturn().getResponse();
         assertTrue(response.getContentAsString().contains(Integer.toString(actualId)));

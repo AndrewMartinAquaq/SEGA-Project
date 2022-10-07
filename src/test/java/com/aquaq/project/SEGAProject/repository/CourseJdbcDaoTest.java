@@ -117,7 +117,7 @@ public class CourseJdbcDaoTest {
     }
 
     @Test
-    public void getByCourseTest(){
+    public void getCourseByNameTest(){
         int actualId = 1;
         String actualCourseName = "COM101";
         int actualCapacity = 100;
@@ -131,8 +131,36 @@ public class CourseJdbcDaoTest {
 
         when(templateMock.query(anyString(), any(Object[].class), any(CourseRowMapper.class))).thenReturn(mockList);
 
-        List<Course> courseList = repository.getByCourse(actualCourseName);
+        List<Course> courseList = repository.getCourseByName(actualCourseName);
        Course course = courseList.get(0);
+
+        verify(templateMock, times(1)).query(anyString(), any(Object[].class), any(CourseRowMapper.class));
+
+        assertEquals(actualId, course.getId());
+        assertEquals(actualCourseName, course.getCourseName());
+        assertEquals(actualCapacity, course.getCapacity());
+        assertEquals(actualCredit, course.getCredit());
+        assertEquals(actualSubject, course.getSubject());
+        assertEquals(actualSemester, course.getSemester());
+    }
+
+    @Test
+    public void getCourseBySubjectTest(){
+        int actualId = 1;
+        String actualCourseName = "COM101";
+        int actualCapacity = 100;
+        int actualCredit = 10;
+        String actualSubject = "Java Programming";
+        String actualSemester = "DECEMBER2022";
+
+        List<Course> mockList = new ArrayList<>();
+
+        mockList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
+
+        when(templateMock.query(anyString(), any(Object[].class), any(CourseRowMapper.class))).thenReturn(mockList);
+
+        List<Course> courseList = repository.getCourseBySubject(actualCourseName);
+        Course course = courseList.get(0);
 
         verify(templateMock, times(1)).query(anyString(), any(Object[].class), any(CourseRowMapper.class));
 

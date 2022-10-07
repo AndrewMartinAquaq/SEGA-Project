@@ -1,9 +1,7 @@
 package com.aquaq.project.SEGAProject.rest;
 
 import com.aquaq.project.SEGAProject.dto.CourseDTO;
-import com.aquaq.project.SEGAProject.dto.StudentDTO;
 import com.aquaq.project.SEGAProject.entity.Course;
-import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.CourseJdbcDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +17,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +48,7 @@ public class CourseRestControllerTest {
 
         expectedList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
         when(courseJdbcDao.getAllCourses()).thenReturn(expectedList);
-        List<Course> actualList = courseRestController.getAllCourse();
+        List<Course> actualList = courseRestController.getAllCourse(null);
 
         verify(courseJdbcDao).getAllCourses();
 
@@ -70,10 +67,10 @@ public class CourseRestControllerTest {
         List<Course> expectedList = new ArrayList<>();
 
         expectedList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
-        when(courseJdbcDao.getByCourse(actualCourseName)).thenReturn(expectedList);
+        when(courseJdbcDao.getCourseByName(actualCourseName)).thenReturn(expectedList);
         List<Course> actualList = courseRestController.getCourseByName(actualCourseName);
 
-        verify(courseJdbcDao).getByCourse(actualCourseName);
+        verify(courseJdbcDao).getCourseByName(actualCourseName);
 
         assertEquals(expectedList.get(0), actualList.get(0));
     }

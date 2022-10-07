@@ -40,9 +40,15 @@ public class StudentJdbcDao {
 
     public int insert(Student student){
         KeyHolder keyHolder = keyHolderFactory.newKeyHolder();
+
         String sql = "insert into student (first_name, last_name, grad_year)" +
-                "values(\'" + student.getFirstName() +"\', \'"+ student.getLastName() +"\', \'"+student.getGraduationDate()+"\')";
-        jdbcTemplate.update(c -> c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS), keyHolder);
+                "values(?, ?, ?)";
+        jdbcTemplate.update(c -> { PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, student.getFirstName());
+            ps.setString(2, student.getLastName());
+            ps.setString(3, student.getGraduationDate());
+            return ps;
+            }, keyHolder);
 
         return keyHolder.getKey().intValue();
     }

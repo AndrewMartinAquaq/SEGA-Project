@@ -56,13 +56,19 @@ public class CourseRestController {
     }
 
     @GetMapping("/course")
-    public List<Course> getAllCourse(){
-        return repository.getAllCourses();
+    public List<Course> getAllCourse(@RequestParam(required = false) String subject){
+        if(subject == null){
+            return repository.getAllCourses();
+        }
+        else {
+            return repository.getCourseBySubject(subject);
+        }
+
     }
 
     @GetMapping("/course/name")
     public List<Course> getCourseByName(@RequestParam @NotBlank String name){
-        List<Course> courseList = repository.getByCourse(name);
+        List<Course> courseList = repository.getCourseByName(name);
 
         if(courseList.size() == 0){
             throw new RecordNotFoundException("No course records found where name matches - " + name );
