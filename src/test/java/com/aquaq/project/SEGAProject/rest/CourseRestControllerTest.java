@@ -42,7 +42,7 @@ public class CourseRestControllerTest {
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
         List<Course> expectedList = new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class CourseRestControllerTest {
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
         List<Course> expectedList = new ArrayList<>();
 
@@ -76,13 +76,13 @@ public class CourseRestControllerTest {
     }
 
     @Test
-    public void getStudentByIdTest(){
+    public void getCourseByIdTest(){
         int actualId = 1;
         String actualCourseName = "COM101";
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
         Course expectedCourse = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
 
@@ -96,7 +96,7 @@ public class CourseRestControllerTest {
     }
 
     @Test
-    public void deleteStudentByIdTest(){
+    public void deleteCourseByIdTest(){
 
         when(courseJdbcDao.deleteByID(anyInt())).thenReturn(1);
 
@@ -108,13 +108,13 @@ public class CourseRestControllerTest {
     }
 
     @Test
-    public void postStudentTest(){
+    public void postCourseTest(){
         int actualId = 1;
         String actualCourseName = "COM101";
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
         Course expectedCourse = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
         CourseDTO courseDTO = new CourseDTO(actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
@@ -131,13 +131,13 @@ public class CourseRestControllerTest {
     }
 
     @Test
-    public void putStudentTest(){
+    public void putCourseTest(){
         int actualId = 1;
         String actualCourseName = "COM101";
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
         Course expectedCourse = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
         CourseDTO courseDTO = new CourseDTO(actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);

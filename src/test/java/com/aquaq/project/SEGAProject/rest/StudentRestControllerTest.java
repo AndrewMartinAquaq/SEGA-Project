@@ -42,7 +42,7 @@ public class StudentRestControllerTest {
         int actualId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";
+        String actualGradDate = "2022";
 
         List<Student> expectedList = new ArrayList<>();
 
@@ -60,7 +60,7 @@ public class StudentRestControllerTest {
         int actualId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";
+        String actualGradDate = "2022";
 
         List<Student> expectedList = new ArrayList<>();
 
@@ -78,7 +78,7 @@ public class StudentRestControllerTest {
         int actualId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";
+        String actualGradDate = "2022";
 
         Student expectedStudent = new Student(actualId, actualFirstName, actualLastName, actualGradDate);
 
@@ -108,7 +108,7 @@ public class StudentRestControllerTest {
         int actualId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";
+        String actualGradDate = "2022";
 
         Student expectedStudent = new Student(actualId, actualFirstName, actualLastName, actualGradDate);
         StudentDTO studentDTO = new StudentDTO(actualFirstName, actualLastName, actualGradDate);
@@ -129,7 +129,7 @@ public class StudentRestControllerTest {
         int actualId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";
+        String actualGradDate = "2022";
 
         Student expectedStudent = new Student(actualId, actualFirstName, actualLastName, actualGradDate);
         StudentDTO studentDTO = new StudentDTO(actualFirstName, actualLastName, actualGradDate);

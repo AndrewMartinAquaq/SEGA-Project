@@ -43,7 +43,7 @@ public class CourseRestControllerEndpointTest {
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
         List<Course> courseList = new ArrayList<>();
 
@@ -67,7 +67,7 @@ public class CourseRestControllerEndpointTest {
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Python";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
         List<Course> courseList = new ArrayList<>();
 
@@ -91,7 +91,7 @@ public class CourseRestControllerEndpointTest {
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
         List<Course> courseList = new ArrayList<>();
 
@@ -115,7 +115,7 @@ public class CourseRestControllerEndpointTest {
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
 
         Course course = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
@@ -152,7 +152,7 @@ public class CourseRestControllerEndpointTest {
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
         Course course = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
 
@@ -162,6 +162,7 @@ public class CourseRestControllerEndpointTest {
         String requestJson=ow.writeValueAsString(course);
 
         when(courseRepository.insert(course)).thenReturn(1);
+        when(modelMapper.map(any(CourseDTO.class), any())).thenReturn(course);
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/api/course")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -177,7 +178,7 @@ public class CourseRestControllerEndpointTest {
         int actualCapacity = 100;
         int actualCredit = 10;
         String actualSubject = "Java Programming";
-        String actualSemester = "DECEMBER2022";
+        String actualSemester = "SUMMER2022";
 
 
         Course course = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);

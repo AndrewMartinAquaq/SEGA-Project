@@ -43,7 +43,7 @@ public class StudentRestControllerEndpointTest {
         int expectedId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";
+        String actualGradDate = "2022";
         when(studentRepository.getById(1)).thenReturn(new Student(expectedId, actualFirstName, actualLastName, actualGradDate));
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/student/1"))
                 .andExpect(status().isOk()).andReturn().getResponse();
@@ -58,7 +58,7 @@ public class StudentRestControllerEndpointTest {
         int expectedId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";
+        String actualGradDate = "2022";
 
         List<Student> studentList = new ArrayList<>();
         studentList.add(new Student(expectedId, actualFirstName, actualLastName, actualGradDate));
@@ -79,7 +79,7 @@ public class StudentRestControllerEndpointTest {
         int expectedId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";;
+        String actualGradDate = "2022";;
 
         Student student = new Student(expectedId, actualFirstName, actualLastName, actualGradDate);
 
@@ -89,6 +89,7 @@ public class StudentRestControllerEndpointTest {
         String requestJson=ow.writeValueAsString(student);
 
         when(studentRepository.insert(student)).thenReturn(1);
+        when(modelMapper.map(any(StudentDTO.class), any())).thenReturn(student);
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/api/student")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(requestJson))
@@ -102,7 +103,7 @@ public class StudentRestControllerEndpointTest {
         int expectedId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";;
+        String actualGradDate = "2022";;
 
         Student student = new Student(expectedId, actualFirstName, actualLastName, actualGradDate);
 
@@ -127,7 +128,7 @@ public class StudentRestControllerEndpointTest {
         int expectedId = 1;
         String actualFirstName = "John";
         String actualLastName = "Doe";
-        String actualGradDate = "DECEMBER2022";
+        String actualGradDate = "2022";
 
         List<Student> studentList = new ArrayList<>();
         studentList.add(new Student(expectedId, actualFirstName, actualLastName, actualGradDate));
