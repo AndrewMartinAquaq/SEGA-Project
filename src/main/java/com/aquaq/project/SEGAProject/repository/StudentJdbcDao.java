@@ -1,5 +1,6 @@
 package com.aquaq.project.SEGAProject.repository;
 
+import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,20 @@ public class StudentJdbcDao {
                 "WHERE COURSE.SEMESTER = ?;";
 
         return jdbcTemplate.query(sql, new Object[]{ semester }, new StudentRowMapper());
+    }
+
+    public List<Course> getStudentsCourses(int id, String semester) {
+
+        String sql = "SELECT COURSE.* " +
+                "  FROM COURSE " +
+                "LEFT OUTER JOIN ENROLLMENT " +
+                "  ON COURSE .ID  = ENROLLMENT.COURSE_ID " +
+                "LEFT OUTER JOIN STUDENT " +
+                "  ON ENROLLMENT.STUDENT_ID   = STUDENT .ID " +
+                "WHERE COURSE.SEMESTER = ? AND " +
+                "STUDENT.ID = ?";
+
+        return jdbcTemplate.query(sql, new Object[]{ semester, id }, new CourseRowMapper());
     }
 
 }

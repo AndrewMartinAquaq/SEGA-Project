@@ -1,6 +1,7 @@
 package com.aquaq.project.SEGAProject.rest;
 
 import com.aquaq.project.SEGAProject.dto.StudentDTO;
+import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
@@ -103,9 +104,23 @@ public class StudentRestController {
         List<Student> studentList = repository.getStudentsBySemester(semester);
 
         if(studentList.size() == 0){
-            throw new RecordNotFoundException("No students found enrolled during semester -  " + semester);
+            throw new RecordNotFoundException("No students found enrolled during semester - " + semester);
         }
 
         return studentList;
+    }
+
+    @GetMapping("student/{id}/course")
+    public List<Course> getStudentsCourses(@RequestParam @NotBlank String semester, @PathVariable int id){
+
+        restValidation.validateSemester(semester);
+
+        List<Course> studentCoursesList = repository.getStudentsCourses(id, semester);
+
+        if(studentCoursesList.size() == 0){
+            throw new RecordNotFoundException("No student at id - " + id +" or not enrolled in semester - " + semester);
+        }
+
+        return studentCoursesList;
     }
 }
