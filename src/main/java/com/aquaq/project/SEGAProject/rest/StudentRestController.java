@@ -3,22 +3,17 @@ package com.aquaq.project.SEGAProject.rest;
 import com.aquaq.project.SEGAProject.dto.StudentDTO;
 import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
-import com.aquaq.project.SEGAProject.rest.exceptions.InvalidInputException;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api")
@@ -30,16 +25,19 @@ public class StudentRestController {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    RestValidation restValidation;
+
     @PostMapping("/student")
     public ResponseEntity<String> postStudent(@RequestBody @Valid StudentDTO studentDTO){
             Student student = this.modelMapper.map(studentDTO, Student.class);
 
-            validatedGradDate(student.getGraduationDate());
+            restValidation.validateGradDate(student.getGraduationDate());
 
             int id = repository.insert(student);
             String body = "{ \"studentsAdded\" : 1, \"Link\"  : \"http://localhost:8080/api/student/" + id + "\" }";
 
-            return createResponseEntity(body, HttpStatus.CREATED);
+            return restValidation.createResponse(body, HttpStatus.CREATED);
     }
 
     @PutMapping("/student/{id}")
@@ -48,7 +46,7 @@ public class StudentRestController {
         Student student = this.modelMapper.map(studentDTO, Student.class);
         student.setId(id);
 
-        validatedGradDate(student.getGraduationDate());
+        restValidation.validateGradDate(student.getGraduationDate());
 
         try {
             repository.update(student);
@@ -56,7 +54,7 @@ public class StudentRestController {
             throw new RecordNotFoundException("Student record not found at id - " + id);
         }
         String body = "{ \"studentsUpdated\" : 1, \"Link\" : \"http://localhost:8080/api/student/" + id + "\" }";
-        return createResponseEntity(body, HttpStatus.OK);
+        return restValidation.createResponse(body, HttpStatus.OK);
     }
 
     @GetMapping("/student")
@@ -94,21 +92,20 @@ public class StudentRestController {
             throw new RecordNotFoundException("Student record not found at id - " + id);
         }
 
-        return createResponseEntity("{ \"studentsDeleted\" : 1 }", HttpStatus.OK);
+        return restValidation.createResponse("{ \"studentsDeleted\" : 1 }", HttpStatus.OK);
     }
 
-    private void validatedGradDate(String gradDate){
-        Pattern pattern = Pattern.compile("\\b[0-9]{4}+$\\b");
-        Matcher matcher = pattern.matcher(gradDate);
-        boolean matchFound = matcher.find();
-        if(!matchFound){
-            throw new InvalidInputException("Graduation date format invalid, must follow the following pattern: YEAR (eg. 2022)");
+    @GetMapping("student/semester")
+    public List<Student> getStudentsBySemester(@RequestParam @NotBlank String semester){
+
+        restValidation.validateSemester(semester);
+
+        List<Student> studentList = repository.getStudentsBySemester(semester);
+
+        if(studentList.size() == 0){
+            throw new RecordNotFoundException("No students found enrolled during semester -  " + semester);
         }
-    }
 
-    private static ResponseEntity<String> createResponseEntity(String body, HttpStatus status) {
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Content-Type", "application/json");
-        return ResponseEntity.status(status.value()).headers(responseHeaders).body(body);
+        return studentList;
     }
 }

@@ -5,7 +5,6 @@ import com.aquaq.project.SEGAProject.repository.EnrollmentJdbcDao;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +17,9 @@ public class EnrollmentRestController {
 
     @Autowired
     EnrollmentJdbcDao repository;
+
+    @Autowired
+    RestValidation restValidation;
 
     @PostMapping("/enroll")
     public ResponseEntity<String> postEnroll(@RequestBody @Valid EnrollDTO enrollDTO){
@@ -33,7 +35,7 @@ public class EnrollmentRestController {
         String body = "{ \"studentsEnrolled\" : " + studentsEnrolled + ", " +
                 "\"StudentLink\"  : \"http://localhost:8080/api/student/" + enrollDTO.getStudentId() + "\", " +
                 "\"CourseLink\"  : \"http://localhost:8080/api/course/" + enrollDTO.getCourseId() + "\"}";
-        return createResponseEntity(body, HttpStatus.CREATED);
+        return restValidation.createResponse(body, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/enroll")
@@ -45,12 +47,6 @@ public class EnrollmentRestController {
             throw new RecordNotFoundException("Enrollment record not found at studentId - " + studentId + " and CourseId - " + courseId);
         }
 
-        return createResponseEntity("{ \"studentsUnEnrolled\" : 1 }", HttpStatus.OK);
-    }
-
-    private static ResponseEntity<String> createResponseEntity(String body, HttpStatus status) {
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Content-Type", "application/json");
-        return ResponseEntity.status(status.value()).headers(responseHeaders).body(body);
+        return restValidation.createResponse("{ \"studentsUnEnrolled\" : 1 }", HttpStatus.OK);
     }
 }

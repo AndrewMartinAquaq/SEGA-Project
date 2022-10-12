@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -21,8 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,11 +36,17 @@ public class EnrollmentRestControllerEndpointTest {
     @MockBean
     private EnrollmentJdbcDao enrollRepository;
 
+    @MockBean
+    private RestValidation restValidation;
+
     @Test
     @DirtiesContext
     public void postEnrollTest() throws Exception {
         int expectedStudent = 1;
         int expectedCourse = 1;
+        String body = "{ \"studentsEnrolled\" : 1," +
+                "\"StudentLink\"  : \"http://localhost:8080/api/student/" + expectedStudent + "\", " +
+                "\"CourseLink\"  : \"http://localhost:8080/api/course/" + expectedCourse + "\"}";
 
         EnrollDTO enrollDTO = new EnrollDTO(expectedStudent, expectedCourse);
 
@@ -49,6 +56,9 @@ public class EnrollmentRestControllerEndpointTest {
         String requestJson=ow.writeValueAsString(enrollDTO);
 
         when(enrollRepository.enrollInCourse(1, 1)).thenReturn(1);
+        when(restValidation.createResponse(anyString(), any(HttpStatus.class))).
+                thenReturn(responseEntityBuilder(body, HttpStatus.CREATED));
+
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/api/enroll")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -59,11 +69,21 @@ public class EnrollmentRestControllerEndpointTest {
     @Test
     @DirtiesContext
     public void deleteEnrollTest() throws Exception{
+        String body = "{ \"studentsUnEnrolled\" : 1 }";
+
         when(enrollRepository.unEnrollFromCourse(1, 1)).thenReturn(1);
+        when(restValidation.createResponse(anyString(), any(HttpStatus.class))).
+                thenReturn(responseEntityBuilder(body, HttpStatus.OK));
 
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.delete("/api/enroll?studentId=1&courseId=1"))
                 .andExpect(status().isOk()).andReturn().getResponse();
 
         assertTrue(response.getContentAsString().contains(Integer.toString(1)));
+    }
+
+    private ResponseEntity<String> responseEntityBuilder(String body, HttpStatus status){
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "application/json");
+        return ResponseEntity.status(status.value()).headers(responseHeaders).body(body);
     }
 }

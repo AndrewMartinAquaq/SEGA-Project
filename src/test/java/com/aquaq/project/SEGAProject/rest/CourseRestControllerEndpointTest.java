@@ -11,7 +11,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,6 +25,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,6 +39,9 @@ public class CourseRestControllerEndpointTest {
 
     @MockBean
     private ModelMapper modelMapper;
+
+    @MockBean
+    private RestValidation restValidation;
 
     @Test
     public void getAllCoursesTest() throws Exception {
@@ -135,9 +142,11 @@ public class CourseRestControllerEndpointTest {
     @Test
     @DirtiesContext
     public void deleteCourseByIdTest() throws Exception {
-
+        String body = "{ \"coursesDeleted\" : 1 }";
 
         when(courseRepository.deleteByID(1)).thenReturn(1);
+        when(restValidation.createResponse(anyString(), any(HttpStatus.class)))
+                .thenReturn(responseEntityBuilder(body, HttpStatus.OK));
 
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.delete("/api/course/1"))
                 .andExpect(status().isOk()).andReturn().getResponse();
@@ -153,6 +162,8 @@ public class CourseRestControllerEndpointTest {
         int actualCredit = 10;
         String actualSubject = "Java Programming";
         String actualSemester = "SUMMER2022";
+        String body =  "{ \"Courses\" : 1, \"Link\" : \"http://localhost:8080/api/course/" + actualId + "\" }";
+
 
         Course course = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
 
@@ -163,6 +174,9 @@ public class CourseRestControllerEndpointTest {
 
         when(courseRepository.insert(course)).thenReturn(1);
         when(modelMapper.map(any(CourseDTO.class), any())).thenReturn(course);
+        when(restValidation.createResponse(anyString(), any(HttpStatus.class)))
+                .thenReturn(responseEntityBuilder(body, HttpStatus.CREATED));
+
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.post("/api/course")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -179,7 +193,7 @@ public class CourseRestControllerEndpointTest {
         int actualCredit = 10;
         String actualSubject = "Java Programming";
         String actualSemester = "SUMMER2022";
-
+        String body = "{ \"coursesUpdated\" : 1, \"Link\" : \"http://localhost:8080/api/course/" + actualId + "\" }";
 
         Course course = new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester);
 
@@ -190,10 +204,19 @@ public class CourseRestControllerEndpointTest {
 
         when(courseRepository.update(course)).thenReturn(1);
         when(modelMapper.map(any(CourseDTO.class), any())).thenReturn(course);
+        when(restValidation.createResponse(anyString(), any(HttpStatus.class)))
+                .thenReturn(responseEntityBuilder(body, HttpStatus.OK));
+
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.put("/api/course/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk()).andReturn().getResponse();
         assertTrue(response.getContentAsString().contains(Integer.toString(1)));
+    }
+
+    private ResponseEntity<String> responseEntityBuilder(String body, HttpStatus status){
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "application/json");
+        return ResponseEntity.status(status.value()).headers(responseHeaders).body(body);
     }
 }

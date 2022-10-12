@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -17,8 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +32,9 @@ public class StudentRestControllerTest {
 
     @Mock
     ModelMapper modelMapper;
+
+    @Mock
+    RestValidation restValidation;
 
     @BeforeEach
     public void setup(){
@@ -93,14 +97,17 @@ public class StudentRestControllerTest {
 
     @Test
     public void deleteStudentByIdTest(){
-
+        String body = "{ \"studentsDeleted\" : 1 }";
         when(studentRepository.deleteByID(anyInt())).thenReturn(1);
+        when(restValidation.createResponse(anyString(), any(HttpStatus.class)))
+                .thenReturn(responseEntityBuilder(body, HttpStatus.OK));
 
         ResponseEntity<String> response = studentRestController.deleteStudentById(1);
 
         verify(studentRepository).deleteByID(anyInt());
+        verify(restValidation).createResponse(anyString(), any(HttpStatus.class));
 
-        assertTrue(response.toString().contains("1"));
+        assertTrue(response.toString().contains(body));
     }
 
     @Test
@@ -109,19 +116,23 @@ public class StudentRestControllerTest {
         String actualFirstName = "John";
         String actualLastName = "Doe";
         String actualGradDate = "2022";
+        String body = "{ \"studentsAdded\" : 1, \"Link\"  : \"http://localhost:8080/api/student/" + actualId + "\" }";
 
         Student expectedStudent = new Student(actualId, actualFirstName, actualLastName, actualGradDate);
         StudentDTO studentDTO = new StudentDTO(actualFirstName, actualLastName, actualGradDate);
 
         when(studentRepository.insert(expectedStudent)).thenReturn(1);
         when(modelMapper.map(studentDTO, Student.class)).thenReturn(expectedStudent);
+        when(restValidation.createResponse(anyString(), any(HttpStatus.class)))
+                .thenReturn(responseEntityBuilder(body, HttpStatus.CREATED));
 
         ResponseEntity<String> response = studentRestController.postStudent(studentDTO);
 
         verify(studentRepository).insert(expectedStudent);
         verify(modelMapper).map(studentDTO, Student.class);
+        verify(restValidation).createResponse(anyString(), any(HttpStatus.class));
 
-        assertTrue(response.toString().contains("1"));
+        assertTrue(response.toString().contains(body));
     }
 
     @Test
@@ -130,19 +141,29 @@ public class StudentRestControllerTest {
         String actualFirstName = "John";
         String actualLastName = "Doe";
         String actualGradDate = "2022";
+        String body = "{ \"studentsUpdated\" : 1, \"Link\" : \"http://localhost:8080/api/student/" + actualId + "\" }";
 
         Student expectedStudent = new Student(actualId, actualFirstName, actualLastName, actualGradDate);
         StudentDTO studentDTO = new StudentDTO(actualFirstName, actualLastName, actualGradDate);
 
         when(studentRepository.update(expectedStudent)).thenReturn(1);
         when(modelMapper.map(studentDTO, Student.class)).thenReturn(expectedStudent);
+        when(restValidation.createResponse(anyString(), any(HttpStatus.class)))
+                .thenReturn(responseEntityBuilder(body, HttpStatus.OK));
 
         ResponseEntity<String> response = studentRestController.putStudent(studentDTO, actualId);
 
         verify(studentRepository).update(expectedStudent);
         verify(modelMapper).map(studentDTO, Student.class);
+        verify(restValidation).createResponse(anyString(), any(HttpStatus.class));
 
-        assertTrue(response.toString().contains("1"));
+        assertTrue(response.toString().contains(body));
+    }
+
+    private ResponseEntity<String> responseEntityBuilder(String body, HttpStatus status){
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "application/json");
+        return ResponseEntity.status(status.value()).headers(responseHeaders).body(body);
     }
 
 }

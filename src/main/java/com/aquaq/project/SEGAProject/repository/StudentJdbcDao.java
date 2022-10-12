@@ -1,12 +1,10 @@
 package com.aquaq.project.SEGAProject.repository;
 
 import com.aquaq.project.SEGAProject.entity.Student;
+import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
@@ -81,6 +79,19 @@ public class StudentJdbcDao {
         }
 
         return deleted;
+    }
+
+    public List<Student> getStudentsBySemester(String semester) {
+
+        String sql = "SELECT STUDENT.* " +
+                "  FROM STUDENT " +
+                "LEFT OUTER JOIN ENROLLMENT " +
+                "  ON STUDENT.ID  = ENROLLMENT .STUDENT_ID " +
+                "LEFT OUTER JOIN COURSE " +
+                "  ON ENROLLMENT.COURSE_ID  = COURSE.ID " +
+                "WHERE COURSE.SEMESTER = ?;";
+
+        return jdbcTemplate.query(sql, new Object[]{ semester }, new StudentRowMapper());
     }
 
 }
