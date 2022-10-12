@@ -21,7 +21,21 @@ public class EnrollmentJdbcDao {
         checkCourseCapacity(courseId);
         checkStudentCredit(studentId, courseId);
 
-        return jdbcTemplate.update("insert into Enrollment(student_id, course_id) values(?, ?);", new Object[]{studentId, courseId});
+        return jdbcTemplate.update("insert into Enrollment(student_id, course_id) values(?, ?);",
+                new Object[]{studentId, courseId});
+    }
+
+    public int unEnrollFromCourse(int studentId, int courseId){
+        String deleteSql = "delete from Enrollment where student_id = ? and course_id = ?";
+        Object[] deleteValues = new Object[] {studentId, courseId};
+
+        int deleted = jdbcTemplate.update(deleteSql, deleteValues);
+
+        if (deleted == 0) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
+        return deleted;
     }
 
     private void checkStudentCredit(int studentId, int courseId) {

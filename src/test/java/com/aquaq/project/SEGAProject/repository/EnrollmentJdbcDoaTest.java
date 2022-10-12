@@ -62,4 +62,20 @@ public class EnrollmentJdbcDoaTest {
         assertEquals(1, updated);
     }
 
+    @Test
+    @DirtiesContext
+    public void unEnrollFromCourseTest(){
+        String sql = "delete from Enrollment where student_id = ? and course_id = ?";
+
+        Object[] values = new Object[]{1, 1};
+
+        when(templateMock.update(sql, values)).thenReturn(1);
+
+        int actualNoDeleted = repository.unEnrollFromCourse(1, 1);
+
+        verify(templateMock, times(1)).update(sql, values);
+
+        assertEquals(1, actualNoDeleted);
+    }
+
 }

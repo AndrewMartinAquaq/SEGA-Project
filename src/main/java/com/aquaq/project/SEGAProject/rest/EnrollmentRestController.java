@@ -8,10 +8,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -37,6 +34,18 @@ public class EnrollmentRestController {
                 "\"StudentLink\"  : \"http://localhost:8080/api/student/" + enrollDTO.getStudentId() + "\", " +
                 "\"CourseLink\"  : \"http://localhost:8080/api/course/" + enrollDTO.getCourseId() + "\"}";
         return createResponseEntity(body, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/enroll")
+    public ResponseEntity<String> deleteEnroll(@RequestParam int studentId, @RequestParam int courseId){
+
+        try {
+            repository.unEnrollFromCourse(studentId, courseId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new RecordNotFoundException("Enrollment record not found at studentId - " + studentId + " and CourseId - " + courseId);
+        }
+
+        return createResponseEntity("{ \"studentsUnEnrolled\" : 1 }", HttpStatus.OK);
     }
 
     private static ResponseEntity<String> createResponseEntity(String body, HttpStatus status) {

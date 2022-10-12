@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +21,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,6 +53,17 @@ public class EnrollmentRestControllerEndpointTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isCreated()).andReturn().getResponse();
+        assertTrue(response.getContentAsString().contains(Integer.toString(1)));
+    }
+
+    @Test
+    @DirtiesContext
+    public void deleteEnrollTest() throws Exception{
+        when(enrollRepository.unEnrollFromCourse(1, 1)).thenReturn(1);
+
+        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.delete("/api/enroll?studentId=1&courseId=1"))
+                .andExpect(status().isOk()).andReturn().getResponse();
+
         assertTrue(response.getContentAsString().contains(Integer.toString(1)));
     }
 }

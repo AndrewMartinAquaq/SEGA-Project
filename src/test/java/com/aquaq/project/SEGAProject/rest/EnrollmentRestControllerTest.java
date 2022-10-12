@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +42,18 @@ public class EnrollmentRestControllerTest {
         ResponseEntity<String> response = enrollmentRestController.postEnroll(enrollDTO);
 
         verify(enrollRepository).enrollInCourse(actualStudentId, actualCourseId);
+
+        assertTrue(response.toString().contains("1"));
+    }
+
+    @Test
+    public void deleteEnrollTest(){
+
+        when(enrollRepository.unEnrollFromCourse(anyInt(), anyInt())).thenReturn(1);
+
+        ResponseEntity<String> response = enrollmentRestController.deleteEnroll(1, 1);
+
+        verify(enrollRepository).unEnrollFromCourse(anyInt(), anyInt());
 
         assertTrue(response.toString().contains("1"));
     }
