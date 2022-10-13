@@ -1,6 +1,7 @@
 package com.aquaq.project.SEGAProject.rest;
 
 import com.aquaq.project.SEGAProject.dto.StudentDTO;
+import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
 import org.junit.jupiter.api.BeforeEach;
@@ -164,6 +165,51 @@ public class StudentRestControllerTest {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", "application/json");
         return ResponseEntity.status(status.value()).headers(responseHeaders).body(body);
+    }
+
+    @Test
+    public void getStudentBySemesterTest(){
+        int actualId = 1;
+        String actualFirstName = "John";
+        String actualLastName = "Doe";
+        String actualGradDate = "2022";
+        String semester = "SPRING2023";
+
+        List<Student> expectedList = new ArrayList<>();
+
+        expectedList.add(new Student(actualId, actualFirstName, actualLastName, actualGradDate));
+
+        when(studentRepository.getStudentsBySemester(anyString())).thenReturn(expectedList);
+
+        List<Student> actualList = studentRestController.getStudentsBySemester(semester);
+
+        verify(studentRepository).getStudentsBySemester(anyString());
+
+        assertEquals(expectedList, actualList);
+    }
+
+    @Test
+    public void getStudentsCoursesTest(){
+        int actualStudentId = 2;
+
+        int actualId = 1;
+        String actualCourseName = "COM101";
+        int actualCapacity = 100;
+        int actualCredit = 10;
+        String actualSubject = "Java Programming";
+        String actualSemester = "SUMMER2022";
+
+        List<Course> expectedList = new ArrayList<>();
+
+        expectedList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
+
+        when(studentRepository.getStudentsCourses(anyInt(), anyString())).thenReturn(expectedList);
+
+        List<Course> actualList = studentRestController.getStudentsCourses(actualSemester, actualStudentId);
+
+        verify(studentRepository).getStudentsCourses(anyInt(), anyString());
+
+        assertEquals(expectedList, actualList);
     }
 
 }

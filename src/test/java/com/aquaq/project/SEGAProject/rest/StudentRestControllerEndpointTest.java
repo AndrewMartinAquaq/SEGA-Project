@@ -2,6 +2,7 @@ package com.aquaq.project.SEGAProject.rest;
 
 
 import com.aquaq.project.SEGAProject.dto.StudentDTO;
+import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,8 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -172,6 +172,50 @@ public class StudentRestControllerEndpointTest {
                 .andExpect(status().isOk()).andReturn().getResponse();
 
         assertTrue(response.getContentAsString().contains(Integer.toString(1)));
+    }
+
+    @Test
+    public void getStudentBySemesterTest() throws Exception {
+        int expectedId = 1;
+        String actualFirstName = "John";
+        String actualLastName = "Doe";
+        String actualGradDate = "2022";
+        String semester = "SUMMER2023";
+
+        List<Student> studentList = new ArrayList<>();
+        studentList.add(new Student(expectedId, actualFirstName, actualLastName, actualGradDate));
+
+        when(studentRepository.getStudentsBySemester(semester)).thenReturn(studentList);
+        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/student/semester?semester=SUMMER2023"))
+                .andExpect(status().isOk()).andReturn().getResponse();
+        assertTrue(response.getContentAsString().contains(Integer.toString(expectedId)));
+        assertTrue(response.getContentAsString().contains(actualFirstName));
+        assertTrue(response.getContentAsString().contains(actualLastName));
+        assertTrue(response.getContentAsString().contains(actualGradDate));
+    }
+
+    @Test
+    public void getStudentCoursesTest() throws Exception {
+        int actualId = 1;
+        String actualCourseName = "COM101";
+        int actualCapacity = 100;
+        int actualCredit = 10;
+        String actualSubject = "Java Programming";
+        String actualSemester = "SUMMER2022";
+
+        List<Course> expectedList = new ArrayList<>();
+
+        expectedList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
+
+        when(studentRepository.getStudentsCourses(anyInt(), anyString())).thenReturn(expectedList);
+        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/student/1/course?semester=SUMMER2023"))
+                .andExpect(status().isOk()).andReturn().getResponse();
+        assertTrue(response.getContentAsString().contains(Integer.toString(actualId)));
+        assertTrue(response.getContentAsString().contains(actualCourseName));
+        assertTrue(response.getContentAsString().contains(Integer.toString(actualCapacity)));
+        assertTrue(response.getContentAsString().contains(Integer.toString(actualCredit)));
+        assertTrue(response.getContentAsString().contains(actualSubject));
+        assertTrue(response.getContentAsString().contains(actualSemester));
     }
 
     private ResponseEntity<String> responseEntityBuilder(String body, HttpStatus status){
