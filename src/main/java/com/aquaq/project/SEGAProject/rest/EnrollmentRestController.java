@@ -2,8 +2,10 @@ package com.aquaq.project.SEGAProject.rest;
 
 import com.aquaq.project.SEGAProject.dto.EnrollDTO;
 import com.aquaq.project.SEGAProject.repository.EnrollmentJdbcDao;
+import com.aquaq.project.SEGAProject.rest.exceptions.InvalidInputException;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,10 @@ public class EnrollmentRestController {
             throw new RecordNotFoundException("Student or Course record not found at student id - " +
                     enrollDTO.getStudentId() + " or course id - " + enrollDTO.getCourseId());
         }
+        catch (DuplicateKeyException e){
+            throw new InvalidInputException("Student with Id - " + enrollDTO.getStudentId()
+                    + " is already enrolled in course with Id - " + enrollDTO.getCourseId());
+        }
 
         String body = "{ \"studentsEnrolled\" : " + studentsEnrolled + ", " +
                 "\"StudentLink\"  : \"http://localhost:8080/api/student/" + enrollDTO.getStudentId() + "\", " +
@@ -39,12 +45,13 @@ public class EnrollmentRestController {
     }
 
     @DeleteMapping("/enroll")
-    public ResponseEntity<String> deleteEnroll(@RequestParam int studentId, @RequestParam int courseId){
+    public ResponseEntity<String> deleteEnroll(@RequestBody @Valid EnrollDTO enrollDTO){
 
         try {
-            repository.unEnrollFromCourse(studentId, courseId);
+            repository.unEnrollFromCourse(enrollDTO.getStudentId(), enrollDTO.getCourseId());
         } catch (EmptyResultDataAccessException e) {
-            throw new RecordNotFoundException("Enrollment record not found at studentId - " + studentId + " and CourseId - " + courseId);
+            throw new RecordNotFoundException("Enrollment record not found at studentId - "
+                    + enrollDTO.getStudentId() + " and CourseId - " + enrollDTO.getCourseId());
         }
 
         return restValidation.createResponse("{ \"studentsUnEnrolled\" : 1 }", HttpStatus.OK);

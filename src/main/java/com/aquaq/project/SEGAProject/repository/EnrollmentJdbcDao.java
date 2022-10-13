@@ -18,6 +18,7 @@ public class EnrollmentJdbcDao {
 
     public int enrollInCourse(int studentId, int courseId){
 
+        checkIfRecordsExist(studentId, courseId);
         checkCourseCapacity(courseId);
         checkStudentCredit(studentId, courseId);
 
@@ -73,5 +74,18 @@ public class EnrollmentJdbcDao {
         if(courseCapacity.getTotal() + 1 > courseCapacity.getMax()){
             throw new InvalidInputException("Course capacity met: max students - " + courseCapacity.getMax() + " total students - " + courseCapacity.getTotal() );
         }
+    }
+
+    private void checkIfRecordsExist(int studentId, int courseId){
+        String studentSql = "SELECT * FROM STUDENT WHERE ID = ?";
+        String courseSql = "SELECT * FROM COURSE WHERE ID = ?";
+
+        Boolean studentExists = jdbcTemplate.query(studentSql, new Object[]{studentId}, new StudentRowMapper()).isEmpty();
+        Boolean courseExists = jdbcTemplate.query(courseSql, new Object[]{courseId}, new CourseRowMapper()).isEmpty();
+
+        if(studentExists || courseExists) {
+            throw new EmptyResultDataAccessException(1);
+        }
+
     }
 }

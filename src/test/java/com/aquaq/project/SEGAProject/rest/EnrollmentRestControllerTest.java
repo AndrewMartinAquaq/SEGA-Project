@@ -65,7 +65,9 @@ public class EnrollmentRestControllerTest {
         when(restValidation.createResponse(anyString(), any(HttpStatus.class))).
                 thenReturn(responseEntityBuilder(body, HttpStatus.OK));
 
-        ResponseEntity<String> response = enrollmentRestController.deleteEnroll(1, 1);
+        EnrollDTO enrollDTO = new EnrollDTO(1, 1);
+
+        ResponseEntity<String> response = enrollmentRestController.deleteEnroll(enrollDTO);
 
         verify(enrollRepository).unEnrollFromCourse(anyInt(), anyInt());
         verify(restValidation).createResponse(anyString(), any(HttpStatus.class));

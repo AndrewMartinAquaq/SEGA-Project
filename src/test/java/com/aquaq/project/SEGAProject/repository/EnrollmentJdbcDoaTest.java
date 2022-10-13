@@ -1,19 +1,26 @@
 package com.aquaq.project.SEGAProject.repository;
 
+
 import com.aquaq.project.SEGAProject.SegaProjectApplication;
+import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.EnrollValues;
+import com.aquaq.project.SEGAProject.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,9 +51,17 @@ public class EnrollmentJdbcDoaTest {
 
         EnrollValues enrollValues = new EnrollValues(5, 10);
 
-
         String insertSql = "insert into Enrollment(student_id, course_id) values(?, ?);";
         Object[] insertValues = new Object[]{actualStudentId, actualCourseId};
+
+        List<Student> studentList = new ArrayList<>();
+        List<Course> courseList = new ArrayList<>();
+
+        studentList.add(new Student());
+        courseList.add(new Course());
+
+        when(templateMock.query(anyString(), any(Object[].class), any(StudentRowMapper.class))).thenReturn(studentList);
+        when(templateMock.query(anyString(), any(Object[].class), any(CourseRowMapper.class))).thenReturn(courseList);
 
         when(templateMock.queryForObject(anyString(), any(Object[].class),
                 any(BeanPropertyRowMapper.class))).thenReturn(enrollValues);
@@ -58,6 +73,8 @@ public class EnrollmentJdbcDoaTest {
         verify(templateMock, times(2)).queryForObject(anyString(), any(Object[].class),
                 any(BeanPropertyRowMapper.class));
         verify(templateMock, times(1)).update(insertSql, insertValues);
+        verify(templateMock, times(1)).query(anyString(), any(Object[].class), any(CourseRowMapper.class));
+        verify(templateMock, times(1)).query(anyString(), any(Object[].class), any(StudentRowMapper.class));
 
         assertEquals(1, updated);
     }
