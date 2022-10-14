@@ -1,8 +1,5 @@
 package com.aquaq.project.SEGAProject.entity;
 
-import javax.persistence.Entity;
-import javax.validation.constraints.NotBlank;
-
 public class Student {
 
     private int id;

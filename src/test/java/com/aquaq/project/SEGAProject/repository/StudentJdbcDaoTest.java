@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -172,6 +174,40 @@ public class StudentJdbcDaoTest {
         verify(templateMock, times(1)).update(sql, values);
 
         assertEquals(1, actualNoDeleted);
+    }
+
+    @Test
+    public void getStudentsWrongIdTest(){
+        when(templateMock.queryForObject(anyString(), any(Object[].class), any(StudentRowMapper.class)))
+                .thenThrow(EmptyResultDataAccessException.class);
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+            repository.getById(1);
+        });
+    }
+
+    @Test
+    public void updateStudentsWrongIdTest(){
+        when(templateMock.update(anyString(), any(Object[].class))).thenReturn(0)
+                .thenThrow(EmptyResultDataAccessException.class);
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+            int expectedId = 1;
+            String actualFirstName = "John";
+            String actualLastName = "Doe";
+            String actualGradDate = "DECEMBER2022";
+            Student student = new Student(expectedId, actualFirstName, actualLastName, actualGradDate);
+
+            repository.update(student);
+        });
+    }
+
+    @Test
+    public void deleteStudentsWrongIdTest(){
+        when(templateMock.update(anyString(), any(Object[].class))).thenReturn(0)
+                .thenThrow(EmptyResultDataAccessException.class);
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+
+            repository.deleteByID(1);
+        });
     }
 
 }

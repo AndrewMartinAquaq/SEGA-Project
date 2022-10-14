@@ -5,6 +5,7 @@ import com.aquaq.project.SEGAProject.SegaProjectApplication;
 import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.EnrollValues;
 import com.aquaq.project.SEGAProject.entity.Student;
+import com.aquaq.project.SEGAProject.rest.exceptions.InvalidInputException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -95,4 +98,63 @@ public class EnrollmentJdbcDoaTest {
         assertEquals(1, actualNoDeleted);
     }
 
+    @Test
+    public void UnEnrollWrongIdTest(){
+        when(templateMock.update(anyString(), any(Object[].class)))
+                .thenReturn(0);
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+            repository.unEnrollFromCourse(1, 1);
+        });
+    }
+    @Test
+    public void getStudentsWrongIdTest(){
+        when(templateMock.query(anyString(), any(Object[].class), any(StudentRowMapper.class)))
+                .thenReturn(new ArrayList<>());
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+            repository.enrollInCourse(1, 1);
+        });
+    }
+
+    @Test
+    public void getCourseWrongIdTest(){
+        when(templateMock.query(anyString(), any(Object[].class), any(CourseRowMapper.class)))
+                .thenReturn(new ArrayList<>());
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+            repository.enrollInCourse(1, 1);
+        });
+    }
+
+    @Test
+    public void courseCreditWrongTest() {
+        List<Student> studentList = new ArrayList<>();
+        List<Course> courseList = new ArrayList<>();
+        studentList.add(new Student());
+        courseList.add(new Course());
+        when(templateMock.query(anyString(), any(Object[].class), any(StudentRowMapper.class)))
+                .thenReturn(studentList);
+        when(templateMock.query(anyString(), any(Object[].class), any(CourseRowMapper.class)))
+                .thenReturn(courseList);
+        when(templateMock.queryForObject(anyString(), any(Object[].class), any(BeanPropertyRowMapper.class)))
+                .thenReturn(new EnrollValues(10, 15));
+        assertThrows(InvalidInputException.class, () -> {
+            repository.enrollInCourse(1, 1);
+        });
+    }
+
+    @Test
+    public void courseCapacityWrongTest() {
+        List<Student> studentList = new ArrayList<>();
+        List<Course> courseList = new ArrayList<>();
+        studentList.add(new Student());
+        courseList.add(new Course());
+        when(templateMock.query(anyString(), any(Object[].class), any(StudentRowMapper.class)))
+                .thenReturn(studentList);
+        when(templateMock.query(anyString(), any(Object[].class), any(CourseRowMapper.class)))
+                .thenReturn(courseList);
+        when(templateMock.queryForObject(anyString(), any(Object[].class), any(BeanPropertyRowMapper.class)))
+                .thenReturn(new EnrollValues(5, 5));
+        assertThrows(InvalidInputException.class, () -> {
+            repository.enrollInCourse(1, 1);
+        });
+    }
 }

@@ -13,9 +13,6 @@ public class EnrollmentJdbcDao {
     @Autowired
     public JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public GeneratedKeyHolderFactory keyHolderFactory;
-
     public int enrollInCourse(int studentId, int courseId){
 
         checkIfRecordsExist(studentId, courseId);
@@ -48,7 +45,7 @@ public class EnrollmentJdbcDao {
                 "  ON ENROLLMENT.COURSE_ID  = COURSE.ID " +
                 "WHERE STUDENT.ID = ? AND " +
                 "COURSE.SEMESTER = (SELECT semester from COURSE where id = ?) " +
-                "GROUP BY COURSE.SEMESTER";
+                "GROUP BY COURSE.CREDIT";
         try {
             EnrollValues studentCreditCapacity = jdbcTemplate.queryForObject(maxCreditSql, new Object[]{studentId, courseId},
                     new BeanPropertyRowMapper<EnrollValues>(EnrollValues.class));
@@ -61,13 +58,13 @@ public class EnrollmentJdbcDao {
     }
 
     private void checkCourseCapacity(int courseId) {
-        String courseCapSql ="SELECT count(STUDENT.*) TOTAL, COURSE.CAPACITY AS MAX" +
+        String courseCapSql ="SELECT count(STUDENT.ID) TOTAL, COURSE.CAPACITY AS MAX" +
                 "  FROM COURSE " +
                 "LEFT OUTER JOIN ENROLLMENT " +
                 "  ON COURSE.ID  = ENROLLMENT.COURSE_ID " +
                 "LEFT OUTER JOIN STUDENT " +
                 "  ON ENROLLMENT.STUDENT_ID  = STUDENT.ID " +
-                "WHERE COURSE.ID = ?" +
+                "WHERE COURSE.ID = ? " +
                 "GROUP BY COURSE.CAPACITY";
         EnrollValues courseCapacity = jdbcTemplate.queryForObject(courseCapSql, new Object[]{courseId},
                 new BeanPropertyRowMapper<EnrollValues>(EnrollValues.class));
