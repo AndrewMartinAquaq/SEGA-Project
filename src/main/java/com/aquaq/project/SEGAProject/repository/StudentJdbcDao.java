@@ -102,11 +102,20 @@ public class StudentJdbcDao {
                 "LEFT OUTER JOIN ENROLLMENT " +
                 "  ON COURSE .ID  = ENROLLMENT.COURSE_ID " +
                 "LEFT OUTER JOIN STUDENT " +
-                "  ON ENROLLMENT.STUDENT_ID   = STUDENT .ID " +
-                "WHERE COURSE.SEMESTER = ? AND " +
-                "STUDENT.ID = ?";
+                "  ON ENROLLMENT.STUDENT_ID = STUDENT.ID " +
+                " WHERE STUDENT.ID = ?";
 
-        return jdbcTemplate.query(sql, new Object[]{ semester, id }, new CourseRowMapper());
+        Object[] data;
+
+        if(semester == null){
+            data =  new Object[]{ id };
+        }
+        else{
+            data =  new Object[]{ id,  semester };
+            sql = sql.concat(" AND COURSE.SEMESTER = ?");
+        }
+
+        return jdbcTemplate.query(sql, data, new CourseRowMapper());
     }
 
 }

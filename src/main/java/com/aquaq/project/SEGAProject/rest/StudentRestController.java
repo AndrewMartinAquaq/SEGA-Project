@@ -111,9 +111,11 @@ public class StudentRestController {
     }
 
     @GetMapping("student/{id}/course")
-    public List<Course> getStudentsCourses(@RequestParam @NotBlank String semester, @PathVariable int id){
+    public List<Course> getStudentsCourses(@RequestParam(required = false) @NotBlank String semester, @PathVariable int id){
 
-        restValidation.validateSemester(semester);
+        if(semester != null){
+            restValidation.validateSemester(semester);
+        }
 
         List<Course> studentCoursesList = repository.getStudentsCourses(id, semester);
 

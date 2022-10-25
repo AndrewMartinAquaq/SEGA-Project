@@ -189,7 +189,7 @@ public class CourseJdbcDaoTest {
                 + "where id = ?";
 
         Object[] values = new Object[]{
-                course.getSubject(),
+                course.getCourseName(),
                 course.getCapacity(),
                 course.getCredit(),
                 course.getSubject(),
