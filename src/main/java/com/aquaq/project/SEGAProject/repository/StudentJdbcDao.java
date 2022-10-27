@@ -2,7 +2,8 @@ package com.aquaq.project.SEGAProject.repository;
 
 import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.Student;
-import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,23 +22,29 @@ public class StudentJdbcDao {
     @Autowired
     public GeneratedKeyHolderFactory keyHolderFactory;
 
+    private static final Logger logger = LoggerFactory.getLogger(StudentJdbcDao.class);
+
 
     public List<Student> getAllStudents(){
+        logger.info("Getting all students from database");
         return jdbcTemplate.query("select * from Student",
                new StudentRowMapper());
     }
 
     public Student getById(int id){
+        logger.info("Getting course at Id " + id + " from database");
         return jdbcTemplate.queryForObject("select * from Student where id=?", new Object[]{id},
                 new StudentRowMapper());
     }
 
     public List<Student> getByName(String name){
+        logger.info("Getting all students with name " + name + " from database");
        return jdbcTemplate.query("select * from Student where first_name =? or last_name=?", new Object[]{name, name},
                 new StudentRowMapper());
     }
 
     public int insert(Student student){
+        logger.info("Inserting new student into database");
         KeyHolder keyHolder = keyHolderFactory.newKeyHolder();
 
         String sql = "insert into student (first_name, last_name, grad_year)" +
@@ -53,6 +60,7 @@ public class StudentJdbcDao {
     }
 
     public int update(Student student){
+        logger.info("Updating student at Id " + student.getId() + " in database");
         String sql = "update student set first_name = ?, last_name = ?, grad_year = ? "
                 + "where id = ?";
 
@@ -71,7 +79,7 @@ public class StudentJdbcDao {
         return student.getId();
     }
     public int deleteByID(int id) {
-
+        logger.info("Deleting student at id " + id + " from database");
         int deleted = jdbcTemplate.update("delete from Student where id=?", new Object[]{id});
 
 
@@ -83,7 +91,7 @@ public class StudentJdbcDao {
     }
 
     public List<Student> getStudentsBySemester(String semester) {
-
+        logger.info("Getting students enrolled in semester " + semester + " database");
         String sql = "SELECT STUDENT.* " +
                 "  FROM STUDENT " +
                 "LEFT OUTER JOIN ENROLLMENT " +
@@ -96,7 +104,7 @@ public class StudentJdbcDao {
     }
 
     public List<Course> getStudentsCourses(int id, String semester) {
-
+        logger.info("Getting courses student at Id " + id + " from database");
         String sql = "SELECT COURSE.* " +
                 "  FROM COURSE " +
                 "LEFT OUTER JOIN ENROLLMENT " +

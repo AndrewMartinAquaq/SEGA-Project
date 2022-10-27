@@ -4,6 +4,8 @@ import com.aquaq.project.SEGAProject.dto.EnrollDTO;
 import com.aquaq.project.SEGAProject.repository.EnrollmentJdbcDao;
 import com.aquaq.project.SEGAProject.rest.exceptions.InvalidInputException;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -23,8 +25,11 @@ public class EnrollmentRestController {
     @Autowired
     RestValidation restValidation;
 
+    private static final Logger logger = LoggerFactory.getLogger(EnrollmentRestController.class);
+
     @PostMapping("/enroll")
     public ResponseEntity<String> postEnroll(@RequestBody @Valid EnrollDTO enrollDTO){
+        logger.info("Enrollment POST API Request");
         int studentsEnrolled;
         try{
             studentsEnrolled = repository.enrollInCourse(enrollDTO.getStudentId(), enrollDTO.getCourseId());
@@ -46,7 +51,7 @@ public class EnrollmentRestController {
 
     @DeleteMapping("/enroll")
     public ResponseEntity<String> deleteEnroll(@RequestBody @Valid EnrollDTO enrollDTO){
-
+        logger.info("Enrollment DELETE API Request");
         try {
             repository.unEnrollFromCourse(enrollDTO.getStudentId(), enrollDTO.getCourseId());
         } catch (EmptyResultDataAccessException e) {

@@ -1,6 +1,8 @@
 package com.aquaq.project.SEGAProject.rest;
 
 import com.aquaq.project.SEGAProject.rest.exceptions.InvalidInputException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,17 +14,18 @@ import java.util.regex.Pattern;
 @Component
 public class RestValidation {
 
-    public RestValidation(){
-
-    }
+    private static final Logger logger = LoggerFactory.getLogger(RestValidation.class);
+    public RestValidation(){ }
 
     public ResponseEntity<String> createResponse(String body, HttpStatus status) {
+        logger.info("Creating Response Entity");
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", "application/json");
         return ResponseEntity.status(status.value()).headers(responseHeaders).body(body);
     }
 
     public void validateGradDate(String gradDate){
+        logger.info("Validation graduation date format");
         Pattern pattern = Pattern.compile("\\b^[0-9]{4}+$\\b");
         Matcher matcher = pattern.matcher(gradDate);
         boolean matchFound = matcher.find();
@@ -32,6 +35,7 @@ public class RestValidation {
     }
 
     public void validateSemester(String semester){
+        logger.info("Validating semester format");
         Pattern pattern = Pattern.compile("\\b^(?:SUMMER|WINTER|AUTUMN|SPRING)[0-9]{4}+$\\b");
         Matcher matcher = pattern.matcher(semester);
         boolean matchFound = matcher.find();

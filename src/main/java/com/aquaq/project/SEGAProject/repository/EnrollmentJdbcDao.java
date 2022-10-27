@@ -2,6 +2,8 @@ package com.aquaq.project.SEGAProject.repository;
 
 import com.aquaq.project.SEGAProject.entity.EnrollValues;
 import com.aquaq.project.SEGAProject.rest.exceptions.InvalidInputException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -13,7 +15,10 @@ public class EnrollmentJdbcDao {
     @Autowired
     public JdbcTemplate jdbcTemplate;
 
+    private static final Logger logger = LoggerFactory.getLogger(EnrollmentJdbcDao.class);
+
     public int enrollInCourse(int studentId, int courseId){
+        logger.info("Enrolling student at Id " + studentId + " in course at Id " + courseId + " from database");
 
         checkIfRecordsExist(studentId, courseId);
         checkCourseCapacity(courseId);
@@ -24,6 +29,7 @@ public class EnrollmentJdbcDao {
     }
 
     public int unEnrollFromCourse(int studentId, int courseId){
+        logger.info("UnEnrolling student at Id " + studentId + " from course at Id " + courseId + " in database");
         String deleteSql = "delete from Enrollment where student_id = ? and course_id = ?";
         Object[] deleteValues = new Object[] {studentId, courseId};
 
@@ -37,6 +43,7 @@ public class EnrollmentJdbcDao {
     }
 
     private void checkStudentCredit(int studentId, int courseId) {
+        logger.info("Validating student credit is not over 20");
         String maxCreditSql = "SELECT sum(COURSE.CREDIT) total, COURSE.CREDIT AS MAX " +
                 "  FROM STUDENT " +
                 "LEFT OUTER JOIN ENROLLMENT " +
@@ -58,6 +65,7 @@ public class EnrollmentJdbcDao {
     }
 
     private void checkCourseCapacity(int courseId) {
+        logger.info("Validating course is not at capacity");
         String courseCapSql ="SELECT count(STUDENT.ID) TOTAL, COURSE.CAPACITY AS MAX" +
                 "  FROM COURSE " +
                 "LEFT OUTER JOIN ENROLLMENT " +
@@ -74,6 +82,7 @@ public class EnrollmentJdbcDao {
     }
 
     private void checkIfRecordsExist(int studentId, int courseId){
+        logger.info("Validating that both student and course both exist");
         String studentSql = "SELECT * FROM STUDENT WHERE ID = ?";
         String courseSql = "SELECT * FROM COURSE WHERE ID = ?";
 

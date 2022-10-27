@@ -6,6 +6,8 @@ import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -29,8 +31,11 @@ public class StudentRestController {
     @Autowired
     RestValidation restValidation;
 
+    private static final Logger logger = LoggerFactory.getLogger(StudentRestController.class);
+
     @PostMapping("/student")
     public ResponseEntity<String> postStudent(@RequestBody @Valid StudentDTO studentDTO){
+            logger.info("Student POST API Request");
             Student student = this.modelMapper.map(studentDTO, Student.class);
 
             restValidation.validateGradDate(student.getGraduationDate());
@@ -44,6 +49,7 @@ public class StudentRestController {
     @PutMapping("/student/{id}")
     @ResponseBody()
     public ResponseEntity<String> putStudent(@RequestBody @Valid StudentDTO studentDTO, @PathVariable @NotBlank int id){
+        logger.info("Student PUT API Request");
         Student student = this.modelMapper.map(studentDTO, Student.class);
         student.setId(id);
 
@@ -60,11 +66,13 @@ public class StudentRestController {
 
     @GetMapping("/student")
     public List<Student> getAllStudents(){
+        logger.info("All Students GET API Request");
         return repository.getAllStudents();
     }
 
     @GetMapping("/student/name")
     public List<Student> getStudentByName(@RequestParam @NotBlank String name){
+        logger.info("Student name GET API Request");
         List<Student> studentList = repository.getByName(name);
 
         if(studentList.size() == 0){
@@ -76,6 +84,7 @@ public class StudentRestController {
 
     @GetMapping("/student/{id}")
     public Student getStudentById(@PathVariable @NotBlank  int id) {
+        logger.info("Student Id GET API Request");
         Student student;
         try {
             student = repository.getById(id);
@@ -87,6 +96,7 @@ public class StudentRestController {
 
     @DeleteMapping("/student/{id}")
     public ResponseEntity<String> deleteStudentById(@PathVariable @NotBlank int id){
+        logger.info("Student DELETE API Request");
         try {
             repository.deleteByID(id);
         } catch (EmptyResultDataAccessException e) {
@@ -98,6 +108,7 @@ public class StudentRestController {
 
     @GetMapping("student/semester")
     public List<Student> getStudentsBySemester(@RequestParam @NotBlank String semester){
+        logger.info("Student Semester GET API Request");
 
         restValidation.validateSemester(semester);
 
@@ -112,7 +123,7 @@ public class StudentRestController {
 
     @GetMapping("student/{id}/course")
     public List<Course> getStudentsCourses(@RequestParam(required = false) @NotBlank String semester, @PathVariable int id){
-
+        logger.info("Student Course GET API Request");
         if(semester != null){
             restValidation.validateSemester(semester);
         }
