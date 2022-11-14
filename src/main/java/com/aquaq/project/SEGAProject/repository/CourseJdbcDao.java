@@ -102,4 +102,27 @@ public class CourseJdbcDao {
         return deleted;
     }
 
+    public List<Course> getStudentsCourses(int id, String semester) {
+        logger.info("Getting courses student at Id " + id + " from database");
+        String sql = "SELECT COURSE.* " +
+                "  FROM COURSE " +
+                "LEFT OUTER JOIN ENROLLMENT " +
+                "  ON COURSE .ID  = ENROLLMENT.COURSE_ID " +
+                "LEFT OUTER JOIN STUDENT " +
+                "  ON ENROLLMENT.STUDENT_ID = STUDENT.ID " +
+                " WHERE STUDENT.ID = ?";
+
+        Object[] data;
+
+        if(semester == null){
+            data =  new Object[]{ id };
+        }
+        else{
+            data =  new Object[]{ id,  semester };
+            sql = sql.concat(" AND COURSE.SEMESTER = ?");
+        }
+
+        return jdbcTemplate.query(sql, data, new CourseRowMapper());
+    }
+
 }

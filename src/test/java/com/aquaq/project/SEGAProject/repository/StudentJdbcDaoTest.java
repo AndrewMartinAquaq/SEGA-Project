@@ -177,6 +177,30 @@ public class StudentJdbcDaoTest {
     }
 
     @Test
+    public void getStudentsBySemesterTest(){
+        int actualId = 1;
+        String actualFirstName = "John";
+        String actualLastName = "Doe";
+        String actualGradDate = "DECEMBER2022";
+
+        List<Student> mockList = new ArrayList<>();
+
+        mockList.add(new Student(actualId, actualFirstName, actualLastName, actualGradDate));
+
+        when(templateMock.query(anyString(), any(Object[].class), any(StudentRowMapper.class))).thenReturn(mockList);
+
+        List<Student> studentList = repository.getStudentsBySemester("SUMMER2022");
+        Student student = studentList.get(0);
+
+        verify(templateMock, times(1)).query(anyString(), any(Object[].class), any(StudentRowMapper.class));
+
+        assertEquals(actualId, student.getId());
+        assertEquals(actualFirstName, student.getFirstName());
+        assertEquals(actualLastName, student.getLastName());
+        assertEquals(actualGradDate, student.getGraduationDate());
+    }
+
+    @Test
     public void getStudentsWrongIdTest(){
         when(templateMock.queryForObject(anyString(), any(Object[].class), any(StudentRowMapper.class)))
                 .thenThrow(EmptyResultDataAccessException.class);
@@ -209,5 +233,4 @@ public class StudentJdbcDaoTest {
             repository.deleteByID(1);
         });
     }
-
 }

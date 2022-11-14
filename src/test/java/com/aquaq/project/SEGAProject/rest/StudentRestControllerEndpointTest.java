@@ -4,6 +4,7 @@ package com.aquaq.project.SEGAProject.rest;
 import com.aquaq.project.SEGAProject.dto.StudentDTO;
 import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.Student;
+import com.aquaq.project.SEGAProject.repository.CourseJdbcDao;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -38,6 +39,9 @@ public class StudentRestControllerEndpointTest {
 
     @MockBean
     private StudentJdbcDao studentRepository;
+
+    @MockBean
+    private CourseJdbcDao courseRepository;
 
     @MockBean
     private RestValidation restValidation;
@@ -207,7 +211,7 @@ public class StudentRestControllerEndpointTest {
 
         expectedList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
 
-        when(studentRepository.getStudentsCourses(anyInt(), anyString())).thenReturn(expectedList);
+        when(courseRepository.getStudentsCourses(anyInt(), anyString())).thenReturn(expectedList);
         MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/api/student/1/course?semester=SUMMER2023"))
                 .andExpect(status().isOk()).andReturn().getResponse();
         assertTrue(response.getContentAsString().contains(Integer.toString(actualId)));

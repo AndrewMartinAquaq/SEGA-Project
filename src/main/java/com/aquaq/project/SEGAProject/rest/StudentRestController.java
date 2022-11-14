@@ -3,6 +3,7 @@ package com.aquaq.project.SEGAProject.rest;
 import com.aquaq.project.SEGAProject.dto.StudentDTO;
 import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.Student;
+import com.aquaq.project.SEGAProject.repository.CourseJdbcDao;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
 import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -23,7 +24,10 @@ import java.util.List;
 public class StudentRestController {
 
     @Autowired
-    StudentJdbcDao repository;
+    StudentJdbcDao studentRepository;
+
+    @Autowired
+    CourseJdbcDao courseRepository;
 
     @Autowired
     ModelMapper modelMapper;
@@ -40,7 +44,7 @@ public class StudentRestController {
 
             restValidation.validateGradDate(student.getGraduationDate());
 
-            int id = repository.insert(student);
+            int id = studentRepository.insert(student);
             String body = "{ \"studentsAdded\" : 1, \"Link\"  : \"http://localhost:8080/api/student/" + id + "\" }";
 
             return restValidation.createResponse(body, HttpStatus.CREATED);
@@ -56,7 +60,7 @@ public class StudentRestController {
         restValidation.validateGradDate(student.getGraduationDate());
 
         try {
-            repository.update(student);
+            studentRepository.update(student);
         } catch (EmptyResultDataAccessException e) {
             throw new RecordNotFoundException("Student record not found at id - " + id);
         }
@@ -67,13 +71,13 @@ public class StudentRestController {
     @GetMapping("/student")
     public List<Student> getAllStudents(){
         logger.info("All Students GET API Request");
-        return repository.getAllStudents();
+        return studentRepository.getAllStudents();
     }
 
     @GetMapping("/student/name")
     public List<Student> getStudentByName(@RequestParam @NotBlank String name){
         logger.info("Student name GET API Request");
-        List<Student> studentList = repository.getByName(name);
+        List<Student> studentList = studentRepository.getByName(name);
 
         if(studentList.size() == 0){
             throw new RecordNotFoundException("No student records found where name matches - " + name );
@@ -87,7 +91,7 @@ public class StudentRestController {
         logger.info("Student Id GET API Request");
         Student student;
         try {
-            student = repository.getById(id);
+            student = studentRepository.getById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new RecordNotFoundException("Student record not found at id - " + id);
         }
@@ -98,7 +102,7 @@ public class StudentRestController {
     public ResponseEntity<String> deleteStudentById(@PathVariable @NotBlank int id){
         logger.info("Student DELETE API Request");
         try {
-            repository.deleteByID(id);
+            studentRepository.deleteByID(id);
         } catch (EmptyResultDataAccessException e) {
             throw new RecordNotFoundException("Student record not found at id - " + id);
         }
@@ -112,7 +116,7 @@ public class StudentRestController {
 
         restValidation.validateSemester(semester);
 
-        List<Student> studentList = repository.getStudentsBySemester(semester);
+        List<Student> studentList = studentRepository.getStudentsBySemester(semester);
 
         if(studentList.size() == 0){
             throw new RecordNotFoundException("No students found enrolled during semester - " + semester);
@@ -128,7 +132,7 @@ public class StudentRestController {
             restValidation.validateSemester(semester);
         }
 
-        List<Course> studentCoursesList = repository.getStudentsCourses(id, semester);
+        List<Course> studentCoursesList =courseRepository.getStudentsCourses(id, semester);
 
         if(studentCoursesList.size() == 0){
             throw new RecordNotFoundException("No student at id - " + id +" or not enrolled in semester - " + semester);

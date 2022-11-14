@@ -5,16 +5,22 @@ import com.aquaq.project.SEGAProject.dto.StudentDTO;
 import com.aquaq.project.SEGAProject.entity.Student;
 import com.aquaq.project.SEGAProject.repository.EnrollmentJdbcDao;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
+import com.aquaq.project.SEGAProject.repository.StudentRowMapper;
+import com.aquaq.project.SEGAProject.rest.exceptions.InvalidInputException;
+import com.aquaq.project.SEGAProject.rest.exceptions.RecordNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -73,6 +79,33 @@ public class EnrollmentRestControllerTest {
         verify(restValidation).createResponse(anyString(), any(HttpStatus.class));
 
         assertTrue(response.toString().contains(body));
+    }
+
+    @Test
+    public void postEnrollIncorrectIdTest(){
+        when(enrollRepository.enrollInCourse(anyInt(), anyInt()))
+                .thenThrow(EmptyResultDataAccessException.class);
+        assertThrows(RecordNotFoundException.class, () -> {
+            enrollmentRestController.postEnroll(new EnrollDTO(1, 1));
+        });
+    }
+
+    @Test
+    public void postEnrollAlreadyExistsTest(){
+        when(enrollRepository.enrollInCourse(anyInt(), anyInt()))
+                .thenThrow(DuplicateKeyException.class);
+        assertThrows(InvalidInputException.class, () -> {
+            enrollmentRestController.postEnroll(new EnrollDTO(1, 1));
+        });
+    }
+
+    @Test
+    public void deleteUnEnrollDoseNotExistsTest(){
+        when(enrollRepository.unEnrollFromCourse(anyInt(), anyInt()))
+                .thenThrow(EmptyResultDataAccessException.class);
+        assertThrows(RecordNotFoundException.class, () -> {
+            enrollmentRestController.deleteEnroll(new EnrollDTO(1, 1));
+        });
     }
 
     private ResponseEntity<String> responseEntityBuilder(String body, HttpStatus status){

@@ -3,6 +3,7 @@ package com.aquaq.project.SEGAProject.rest;
 import com.aquaq.project.SEGAProject.dto.StudentDTO;
 import com.aquaq.project.SEGAProject.entity.Course;
 import com.aquaq.project.SEGAProject.entity.Student;
+import com.aquaq.project.SEGAProject.repository.CourseJdbcDao;
 import com.aquaq.project.SEGAProject.repository.StudentJdbcDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,9 @@ public class StudentRestControllerTest {
 
     @Mock
     StudentJdbcDao studentRepository;
+
+    @Mock
+    CourseJdbcDao courseRepository;
 
     @Mock
     ModelMapper modelMapper;
@@ -161,12 +165,6 @@ public class StudentRestControllerTest {
         assertTrue(response.toString().contains(body));
     }
 
-    private ResponseEntity<String> responseEntityBuilder(String body, HttpStatus status){
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Content-Type", "application/json");
-        return ResponseEntity.status(status.value()).headers(responseHeaders).body(body);
-    }
-
     @Test
     public void getStudentBySemesterTest(){
         int actualId = 1;
@@ -203,13 +201,18 @@ public class StudentRestControllerTest {
 
         expectedList.add(new Course(actualId, actualCourseName, actualCapacity, actualCredit, actualSubject, actualSemester));
 
-        when(studentRepository.getStudentsCourses(anyInt(), anyString())).thenReturn(expectedList);
+        when(courseRepository.getStudentsCourses(anyInt(), anyString())).thenReturn(expectedList);
 
         List<Course> actualList = studentRestController.getStudentsCourses(actualSemester, actualStudentId);
 
-        verify(studentRepository).getStudentsCourses(anyInt(), anyString());
+        verify(courseRepository).getStudentsCourses(anyInt(), anyString());
 
         assertEquals(expectedList, actualList);
     }
 
+    private ResponseEntity<String> responseEntityBuilder(String body, HttpStatus status){
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "application/json");
+        return ResponseEntity.status(status.value()).headers(responseHeaders).body(body);
+    }
 }
