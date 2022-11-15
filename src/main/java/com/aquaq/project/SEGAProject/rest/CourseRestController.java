@@ -71,7 +71,11 @@ public class CourseRestController {
             return repository.getAllCourses();
         }
         else {
-            return repository.getCourseBySubject(subject);
+            List<Course> courseList = repository.getCourseBySubject(subject);
+            if(courseList.size() == 0){
+                throw new RecordNotFoundException("No course records found where subject matches - " + subject);
+            }
+            return courseList;
         }
 
     }

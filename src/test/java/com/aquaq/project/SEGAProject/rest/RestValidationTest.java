@@ -46,4 +46,12 @@ public class RestValidationTest {
             restValidation.validateSemester(wrongSemester);
         });
     }
+
+    @Test
+    public void validateNameTest() {
+        assertThrows(InvalidInputException.class, () -> {
+            String wrongName = "with number 1";
+            restValidation.validateName(wrongName);
+        });
+    }
 }

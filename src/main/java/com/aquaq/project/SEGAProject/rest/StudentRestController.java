@@ -43,6 +43,8 @@ public class StudentRestController {
             Student student = this.modelMapper.map(studentDTO, Student.class);
 
             restValidation.validateGradDate(student.getGraduationDate());
+            restValidation.validateName(student.getFirstName());
+            restValidation.validateName(student.getLastName());
 
             int id = studentRepository.insert(student);
             String body = "{ \"studentsAdded\" : 1, \"Link\"  : \"http://localhost:8080/api/student/" + id + "\" }";
@@ -58,6 +60,8 @@ public class StudentRestController {
         student.setId(id);
 
         restValidation.validateGradDate(student.getGraduationDate());
+        restValidation.validateName(student.getFirstName());
+        restValidation.validateName(student.getLastName());
 
         try {
             studentRepository.update(student);
@@ -77,6 +81,7 @@ public class StudentRestController {
     @GetMapping("/student/name")
     public List<Student> getStudentByName(@RequestParam @NotBlank String name){
         logger.info("Student name GET API Request");
+        restValidation.validateName(name);
         List<Student> studentList = studentRepository.getByName(name);
 
         if(studentList.size() == 0){

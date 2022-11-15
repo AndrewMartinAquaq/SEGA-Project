@@ -43,4 +43,14 @@ public class RestValidation {
             throw new InvalidInputException("Semester format invalid, must follow the following pattern: SEASONYEAR (eg. SUMMER2022)");
         }
     }
+
+    public void validateName(String name){
+        logger.info("Validating student name format");
+        Pattern pattern = Pattern.compile("^[a-z A-Z]*$");
+        Matcher matcher = pattern.matcher(name);
+        boolean matchFound = matcher.find();
+        if(!matchFound){
+            throw new InvalidInputException("Name: " + name + " Invalid - Must only contain letters (No numbers or symbols)");
+        }
+    }
 }
