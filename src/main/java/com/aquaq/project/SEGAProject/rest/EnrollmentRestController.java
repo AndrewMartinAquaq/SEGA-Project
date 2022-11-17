@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class EnrollmentRestController {
             throw new RecordNotFoundException("Student or Course record not found at student id - " +
                     enrollDTO.getStudentId() + " or course id - " + enrollDTO.getCourseId());
         }
-        catch (DuplicateKeyException e){
+        catch (DuplicateKeyException | IncorrectResultSizeDataAccessException e){
             throw new InvalidInputException("Student with Id - " + enrollDTO.getStudentId()
                     + " is already enrolled in course with Id - " + enrollDTO.getCourseId());
         }

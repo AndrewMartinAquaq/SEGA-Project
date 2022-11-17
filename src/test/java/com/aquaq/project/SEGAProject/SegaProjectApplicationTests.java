@@ -7,11 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
+@SpringBootTest(classes = SegaProjectApplication.class)
 class SegaProjectApplicationTests {
 
 	@Autowired
-	private ModelMapper modelMapper;
+	private SegaProjectApplication segaProjectApplication;
 
 	@Test
 	public void contextLoads() {
@@ -19,7 +19,7 @@ class SegaProjectApplicationTests {
 
 	@Test
 	public void modelMapperTest(){
-		assertEquals(modelMapper.getClass(), ModelMapper.class);
+		assertEquals(segaProjectApplication.modelMapper().getClass(), ModelMapper.class);
 	}
 
 }
