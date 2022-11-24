@@ -40,9 +40,41 @@ public class RestValidationTest {
     }
 
     @Test
+    public void validateGradDateYearLessTest() {
+        assertThrows(InvalidInputException.class, () -> {
+            String wrongSemester = "1999";
+            restValidation.validateGradDate(wrongSemester);
+        });
+    }
+
+    @Test
+    public void validateGradDateYearMoreTest() {
+        assertThrows(InvalidInputException.class, () -> {
+            String wrongSemester = "3001";
+            restValidation.validateGradDate(wrongSemester);
+        });
+    }
+
+    @Test
     public void validateSemesterTest() {
         assertThrows(InvalidInputException.class, () -> {
             String wrongSemester = "not SUMMER2022";
+            restValidation.validateSemester(wrongSemester);
+        });
+    }
+
+    @Test
+    public void validateSemesterYearLessTest() {
+        assertThrows(InvalidInputException.class, () -> {
+            String wrongSemester = "SUMMER1999";
+            restValidation.validateSemester(wrongSemester);
+        });
+    }
+
+    @Test
+    public void validateSemesterYearMoreTest() {
+        assertThrows(InvalidInputException.class, () -> {
+            String wrongSemester = "SUMMER3001";
             restValidation.validateSemester(wrongSemester);
         });
     }

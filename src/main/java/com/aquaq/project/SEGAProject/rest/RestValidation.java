@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.Integer.parseInt;
+
 @Component
 public class RestValidation {
 
@@ -32,6 +34,13 @@ public class RestValidation {
         if(!matchFound){
             throw new InvalidInputException("Graduation date format invalid, must follow the following pattern: YEAR (eg. 2022)");
         }
+        int year = parseInt(gradDate);
+        if(year < 2000){
+            throw new InvalidInputException("Graduation date format invalid, year must be after 2000");
+        }
+        if(year > 3000){
+            throw new InvalidInputException("Graduation date format invalid, year must be before 3000");
+        }
     }
 
     public void validateSemester(String semester){
@@ -41,6 +50,13 @@ public class RestValidation {
         boolean matchFound = matcher.find();
         if(!matchFound){
             throw new InvalidInputException("Semester format invalid, must follow the following pattern: SEASONYEAR (eg. SUMMER2022)");
+        }
+        int year = parseInt(semester.substring(semester.length() - 4));
+        if(year < 2000){
+            throw new InvalidInputException("Semester format invalid, year must be after 2000");
+        }
+        if(year > 3000){
+            throw new InvalidInputException("Semester format invalid, year must be before 3000");
         }
     }
 

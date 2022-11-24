@@ -99,7 +99,7 @@ public class RestExceptionHandler {
 
         GenericErrorResponse error = new GenericErrorResponse();
 
-        String message = "Value must be a between 0 and 20";
+        String message = "Invalid Input: ensure credits are between 0 and 20 and the course name dose not already exist in the semester";
 
         error.setStatus(HttpStatus.BAD_REQUEST.value());
         error.setMessage(message);
